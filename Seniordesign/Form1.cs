@@ -19,11 +19,36 @@ namespace Seniordesign
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void load_Click(object sender, EventArgs e)
         {
-            Preload pl = new Preload();
-            gamerCache = pl.LoadGamersFromExcel(gamerCache);
+            gamerCache = Preload.LoadGamersFromExcel(gamerCache);
+            if (gamerCache.GamerDictionary.Count > 0)
+            {
+                this.button1.Visible = true;
+            }
+            this.load.Visible = false;
+        }
 
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            this.stop.Visible = true;
+      
+            WMIPrcocess wmiProcess = new WMIPrcocess(this.gamerCache);
+                      
+        }
+
+        private void stop_Click(object sender, EventArgs e)
+        {
+            foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
+            {
+                foreach (string p in g.Processes)
+                {
+                    this.listBox1.Items.Add(p);
+                }
+
+                Console.WriteLine(g.Processes.ToString());
+            }
+        
         }
     }
 }
