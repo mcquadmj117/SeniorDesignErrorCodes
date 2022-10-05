@@ -12,7 +12,7 @@ namespace Seniordesign
 {
     class Preload
     {
-        public  GamerCache LoadGamersFromExcel(GamerCache gamerCache)
+        public static GamerCache LoadGamersFromExcel(GamerCache gamerCache)
         {
           
 
