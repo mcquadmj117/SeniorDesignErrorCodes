@@ -39,7 +39,7 @@ namespace Seniordesign
 
             try
             {
-                for (int i = 1; i <= rowCount; i++)
+                for (int i = 2; i <= rowCount; i++)
                 {
                     Gamer g = new Gamer();
                     for (int j = 1; j <= colCount; j++)
