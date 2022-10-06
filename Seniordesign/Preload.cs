@@ -35,7 +35,7 @@ namespace Seniordesign
                 Excel._Worksheet worksheet = workbook.Sheets[1];
                 Excel.Range range = worksheet.UsedRange;
                 int rowCount = range.Rows.Count;
-                int colCount = range.Columns.Count;
+                int colCount = 8;
 
             try
             {
@@ -44,37 +44,39 @@ namespace Seniordesign
                     Gamer g = new Gamer();
                     for (int j = 1; j <= colCount; j++)
                     {
-                        if (range.Cells[i, j] != null && range.Cells[i, j].Value2 != null)
-                        {
                             switch (j)
                             {
                                 case 1:
-                                    g.Name = range.Cells[i, j]?.Value2?.ToString();
+                                    g.Name = range.Cells[i, j]?.Value2?.ToString() ?? "";
                                     break;
                                 case 2:
-                                  g.Computer_Name = range.Cells[i, j]?.Value2?.ToString();
+                                  g.Computer_Name = range.Cells[i, j]?.Value2?.ToString() ?? "";
                                     break;
                                 case 3:
-                                    g.Mac_Address= range.Cells[i, j].Value2.ToString();
+                                    g.Mac_Address= range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 4:
-                                    g.IP_Address = range.Cells[i, j].Value2.ToString();
+                                    g.IP_Address = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 5:
-                                    g.Username = range.Cells[i, j].Value2.ToString();
+                                    g.Username = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 6:
-                                    g.Password = range.Cells[i, j].Value2.ToString();
+                                    g.Password = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 7:
-                                    g.Game_Executable = range.Cells[i, j].Value2.ToString();
+                                    g.Game_Executable = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 8:
-                                    List<string> processes = new List<string> { range.Cells[i, j]?.Value2?.ToString() };
+                                    List<string> processes = new List<string>();
+                                    if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
+                                    {
+                                       processes = new List<string> { range.Cells[i, j]?.Value2?.ToString() };
+                                    }
                                     g.Processes = processes;
                                     break;
+                            
                             }
-                        }
                     }
                     gamerCache.GamerDictionary.Add(g.Name, g);
                 }
