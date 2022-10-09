@@ -19,14 +19,23 @@ namespace Seniordesign
         {
             this.gamerCache = gamerCache;
             RunInitialProcessesRetrieval();
-            List<string> processList = new List<string>();
-           // Thread threadObject = new Thread(RunProcessWatching);
-            new Thread(RunProcessWatching) { IsBackground = true, Name = "worker" }.Start();
-            Console.WriteLine("Waiting for process events");
-            do
+            List<Thread> threadList = new List<Thread>();
+            // Thread threadObject = new Thread(RunProcessWatching);
+            foreach (Gamer gamer in gamerCache.GamerDictionary.Values) {
+                threadList.Add( new Thread(() => RunProcessWatching(gamer.Name)){ IsBackground = true, Name = gamer.Name });
+
+               // new Thread(RunProcessWatching(gamer.Name)) { IsBackground = true, Name = gamer.Name }.Start();
+            }
+
+        foreach(Thread t in threadList)
             {
-                Thread.Sleep(5000);
-            } while (true);
+                t.Start();
+            }
+            Console.WriteLine("Waiting for process events");
+            //do
+            //{
+            //  //  Thread.Sleep(5000);
+            //} while (true);
             
         }
         private void RunInitialProcessesRetrieval()
@@ -63,18 +72,35 @@ namespace Seniordesign
             }
         }
 
-        private void RunProcessWatching()
+        public void RunProcessWatching(string gamerName)
         {
             try
             {
                 string queryString = "SELECT * FROM __InstanceCreationEvent WITHIN .025 WHERE TargetInstance ISA 'Win32_Process'";
                 var startWatch = new ManagementEventWatcher(@"\\.\root\CIMV2",queryString);
-                startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
+                // startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
+                startWatch.EventArrived += (sender, eventArgs) =>
+                {
+                    try
+                    {
+                        var proc = GetProcessInfo(eventArgs);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("+{0} {1} ({2}) {3} [{4}]",gamerName, proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
+                        //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(ex);
+                    }
+                };
+
                 startWatch.Start();
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("+ Started Process in GREEN");
 
-         
+
+     
             }
             catch (Exception ex)
             {
@@ -83,21 +109,21 @@ namespace Seniordesign
             }
         }
 
-        static void startWatch_EventArrived(object sender, EventArrivedEventArgs e)
-        {
-            try
-            {
-                var proc = GetProcessInfo(e);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("+ {0} ({1}) {2} [{3}]", proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
-                //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(ex);
-            }
-        }
+        //static void startWatch_EventArrived(object sender, EventArrivedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        var proc = GetProcessInfo(e);
+        //        Console.ForegroundColor = ConsoleColor.Green;
+        //        Console.WriteLine("+{0} {1} ({2}) {3} [{4}]", proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
+        //        //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.ForegroundColor = ConsoleColor.Yellow;
+        //        Console.WriteLine(ex);
+        //    }
+        //}
 
         static ProcessInfo GetProcessInfo(EventArrivedEventArgs e)
         {

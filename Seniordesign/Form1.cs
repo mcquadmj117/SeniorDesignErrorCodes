@@ -32,7 +32,7 @@ namespace Seniordesign
         private void button1_Click_1(object sender, EventArgs e)
         {
             this.stop.Visible = true;
-      
+            this.button1.Visible = false;
             WMIPrcocess wmiProcess = new WMIPrcocess(this.gamerCache);
                       
         }
