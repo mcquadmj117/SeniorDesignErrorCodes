@@ -47,7 +47,7 @@ namespace Seniordesign
             // 
             // stop
             // 
-            this.stop.Location = new System.Drawing.Point(914, 112);
+            this.stop.Location = new System.Drawing.Point(971, 117);
             this.stop.Name = "stop";
             this.stop.Size = new System.Drawing.Size(75, 23);
             this.stop.TabIndex = 1;
@@ -58,7 +58,7 @@ namespace Seniordesign
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(274, 112);
+            this.button1.Location = new System.Drawing.Point(209, 126);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 2;
@@ -70,10 +70,11 @@ namespace Seniordesign
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(475, 138);
+            this.listBox1.Location = new System.Drawing.Point(314, 150);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(120, 95);
+            this.listBox1.Size = new System.Drawing.Size(620, 95);
             this.listBox1.TabIndex = 3;
+   
             // 
             // Form1
             // 

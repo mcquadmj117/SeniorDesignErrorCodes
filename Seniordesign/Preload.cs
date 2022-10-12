@@ -68,12 +68,17 @@ namespace Seniordesign
                                     g.Game_Executable = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 8:
-                                    List<string> processes = new List<string>();
+                                    List<string> processNames = new List<string>();
                                     if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
                                     {
-                                       processes = new List<string> { range.Cells[i, j]?.Value2?.ToString() };
+                                       processNames = new List<string> { range.Cells[i, j]?.Value2?.ToString() };
                                     }
-                                    g.Processes = processes;
+                                    //to refactor to get a list of processes
+                                List<Process> processes = new List<Process>();
+                                foreach (string pn in processNames)
+                                {
+                                    g.Processes.Add(new Process { ProcessName = pn});
+                                }
                                     break;
                             
                             }

@@ -11,18 +11,23 @@ namespace Seniordesign
 {
     class WMIPrcocess
     {
-        private GamerCache gamerCache;
+        //private GamerCache gamerCache;
 
-        public bool processesGathered = false;
+        public bool endProcessRetrieval = false;
+
+        public List<Thread> threadList = new List<Thread>();
 
         public WMIPrcocess(GamerCache gamerCache)
         {
-            this.gamerCache = gamerCache;
-            RunInitialProcessesRetrieval();
-            List<Thread> threadList = new List<Thread>();
+            // this.gamerCache = gamerCache;
+            foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
+            {
+                RunInitialProcessesRetrieval(gamer);
+            }
+          
             // Thread threadObject = new Thread(RunProcessWatching);
             foreach (Gamer gamer in gamerCache.GamerDictionary.Values) {
-                threadList.Add( new Thread(() => RunProcessWatching(gamer.Name)){ IsBackground = true, Name = gamer.Name });
+                threadList.Add( new Thread(() => RunProcessWatching(gamer)){ IsBackground = true, Name = gamer.Name });
 
                // new Thread(RunProcessWatching(gamer.Name)) { IsBackground = true, Name = gamer.Name }.Start();
             }
@@ -38,13 +43,13 @@ namespace Seniordesign
             //} while (true);
             
         }
-        private void RunInitialProcessesRetrieval()
+        private void RunInitialProcessesRetrieval(Gamer g)
         {
             try
             {
-                foreach (Gamer g in gamerCache.GamerDictionary.Values)
-                {
-                    processesGathered = false;
+               ///  foreach (Gamer g in gamerCache.GamerDictionary.Values)
+                //{
+                   // processesGathered = false;
 
                     ManagementObjectSearcher searcher =
                         new ManagementObjectSearcher("root\\Cimv2",
@@ -52,18 +57,24 @@ namespace Seniordesign
 
                     foreach (ManagementObject queryObj in searcher.Get())
                     {
+                        Process tempProcess = new Process();
                         Console.WriteLine("-----------------------------------");
                         Console.WriteLine("Win32_Process instance");
                         Console.WriteLine("-----------------------------------");
                         Console.WriteLine("Caption: {0}", queryObj["Caption"]);
-                        if (!g.Processes.Contains(queryObj["Caption"].ToString()))
-                        {
-                            g.Processes.Add(queryObj["Caption"].ToString());
-                        }
+                        tempProcess.ProcessName = queryObj["Caption"].ToString();
+                        tempProcess.Time = DateTime.Now;
+                        tempProcess.Starting = true;
+                        tempProcess.ProcessId = queryObj["PROCESSID"]?.ToString();
+                    if (g.Processes == null)
+                    {
+                        g.Processes = new List<Process>();
+                    }
+                        g.Processes.Add(tempProcess);
                     }
 
-                    processesGathered = true;
-                }
+                   // processesGathered = true;
+               // }
             }
 
             catch (ManagementException e)
@@ -72,7 +83,7 @@ namespace Seniordesign
             }
         }
 
-        public void RunProcessWatching(string gamerName)
+        public void RunProcessWatching(Gamer g)
         {
             try
             {
@@ -83,15 +94,29 @@ namespace Seniordesign
                 {
                     try
                     {
+                        if (this.endProcessRetrieval)
+                        {
+                            startWatch.Stop();
+                        }
                         var proc = GetProcessInfo(eventArgs);
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("+{0} {1} ({2}) {3} [{4}]",gamerName, proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
+                        Console.WriteLine("+{0} {1} ({2}) {3} [{4}]",g.Name, proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
                         //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
+                        Process tempProcess = new Process();
+                        tempProcess.ProcessName = proc.ProcessName;
+                        tempProcess.Time = DateTime.Now;
+                        tempProcess.Starting = true;
+                        tempProcess.ProcessId = proc.PID;
+                        g.Processes.Add(tempProcess);
+                                       
+                      
                     }
                     catch (Exception ex)
                     {
+                        g.ExceptionLog.Add(ex.ToString());
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine(ex);
+                        throw;
                     }
                 };
 
@@ -104,8 +129,10 @@ namespace Seniordesign
             }
             catch (Exception ex)
             {
+                g.ExceptionLog.Add(ex.ToString());
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine(ex);
+                throw;
             }
         }
 
@@ -135,14 +162,27 @@ namespace Seniordesign
                 p.PID = targetInstance.Properties["ProcessId"].Value.ToString();
             }
 
-            catch (ManagementException) {};
+            catch (Exception ex) { throw ex; }
             return p;
         }
 
 
-        public GamerCache GetGamerWithProcesses()
+        //public GamerCache GetGamerWithProcesses()
+        //{
+        //    foreach(Thread t in this.threadList)
+        //    {
+        //        t.Abort();
+        //    }
+        //    return gamerCache;
+        //}
+
+        public void EndProcessRetrieval()
         {
-            return gamerCache;
+            this.endProcessRetrieval = true;
+            foreach (Thread t in this.threadList)
+            {
+                t.Abort();
+            }
         }
 
         internal class ProcessInfo
