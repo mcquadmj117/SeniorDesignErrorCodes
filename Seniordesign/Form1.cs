@@ -13,6 +13,7 @@ namespace Seniordesign
     public partial class Form1 : Form
     {
         GamerCache gamerCache = new GamerCache();
+        WMIPrcocess wmiProcess;
 
         public Form1()
         {
@@ -33,22 +34,27 @@ namespace Seniordesign
         {
             this.stop.Visible = true;
             this.button1.Visible = false;
-            WMIPrcocess wmiProcess = new WMIPrcocess(this.gamerCache);
-                      
+            this.wmiProcess = new WMIPrcocess(this.gamerCache);                     
         }
 
         private void stop_Click(object sender, EventArgs e)
         {
+            this.stop.Enabled = false;
+            wmiProcess.EndProcessRetrieval();
+            this.wmiProcess = null;
+
             foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
             {
-                foreach (string p in g.Processes)
+                foreach (Process p in g.Processes)
                 {
-                    this.listBox1.Items.Add(p);
+                    this.listBox1.Items.Add(p.ProcessName + ":" + p.ProcessId + ":"+ p.Time.ToString( )+ ":" + (p.Starting ? "Starting" : "Stopping") );
                 }
 
                 Console.WriteLine(g.Processes.ToString());
             }
         
         }
+
+     
     }
 }
