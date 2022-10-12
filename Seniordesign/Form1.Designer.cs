@@ -33,6 +33,7 @@ namespace Seniordesign
             this.stop = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
+            this.Load_Results_Into_Excel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // load
@@ -74,13 +75,24 @@ namespace Seniordesign
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(620, 95);
             this.listBox1.TabIndex = 3;
-   
+            // 
+            // Load_Results_Into_Excel
+            // 
+            this.Load_Results_Into_Excel.Location = new System.Drawing.Point(526, 299);
+            this.Load_Results_Into_Excel.Name = "Load_Results_Into_Excel";
+            this.Load_Results_Into_Excel.Size = new System.Drawing.Size(75, 23);
+            this.Load_Results_Into_Excel.TabIndex = 4;
+            this.Load_Results_Into_Excel.Text = "Load_Results_Into_Excel";
+            this.Load_Results_Into_Excel.UseVisualStyleBackColor = true;
+            this.Load_Results_Into_Excel.Visible = false;
+            this.Load_Results_Into_Excel.Click += new System.EventHandler(this.Load_Results_Into_Excel_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1126, 453);
+            this.Controls.Add(this.Load_Results_Into_Excel);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.stop);
@@ -97,6 +109,7 @@ namespace Seniordesign
         private System.Windows.Forms.Button stop;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.Button Load_Results_Into_Excel;
     }
 }
 

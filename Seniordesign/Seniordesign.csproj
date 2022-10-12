@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Preload.cs" />
+    <Compile Include="ExcelWorker.cs" />
     <Compile Include="GamerCache.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

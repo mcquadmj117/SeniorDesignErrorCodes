@@ -22,12 +22,19 @@ namespace Seniordesign
 
         private void load_Click(object sender, EventArgs e)
         {
-            gamerCache = Preload.LoadGamersFromExcel(gamerCache);
+            gamerCache = ExcelWorker.LoadGamersFromExcel(gamerCache);
             if (gamerCache.GamerDictionary.Count > 0)
             {
                 this.button1.Visible = true;
             }
+
             this.load.Visible = false;
+
+            foreach(Gamer g in this.gamerCache.GamerDictionary.Values)
+            {
+                this.listBox1.Items.Add(g.Name);
+            }
+         
         }
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -41,6 +48,7 @@ namespace Seniordesign
         {
             this.stop.Enabled = false;
             wmiProcess.EndProcessRetrieval();
+           //need to work on proper garbage collection
             this.wmiProcess = null;
 
             foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
@@ -55,6 +63,9 @@ namespace Seniordesign
         
         }
 
-     
+        private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine("Load results to excel");
+        }
     }
 }
