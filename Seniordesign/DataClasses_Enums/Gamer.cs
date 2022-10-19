@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Seniordesign
+namespace DataClasses_Enums
 {
     class Gamer
     {
@@ -15,7 +15,7 @@ namespace Seniordesign
         public string Username { get; set; }
         public string Password { get; set; }
         public string Game_Executable { get; set; }
-        public List<Process> Processes { get; set; }
+        public List<Process> Processes { get; set; } = new List<Process>();
 
         public List<string> ExceptionLog { get; set; } = new List<string>();
     }

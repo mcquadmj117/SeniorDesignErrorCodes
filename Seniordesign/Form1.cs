@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataClasses_Enums;
+using Seniordesign.Processes_Workers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,6 +24,7 @@ namespace Seniordesign
 
         private void load_Click(object sender, EventArgs e)
         {
+            //will probably want to load list of banned processes here
             gamerCache = ExcelWorker.LoadGamersFromExcel(gamerCache);
             if (gamerCache.GamerDictionary.Count > 0)
             {
@@ -30,7 +33,7 @@ namespace Seniordesign
 
             this.load.Visible = false;
 
-            foreach(Gamer g in this.gamerCache.GamerDictionary.Values)
+            foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
             {
                 this.listBox1.Items.Add(g.Name);
             }
@@ -48,7 +51,7 @@ namespace Seniordesign
         {
             this.stop.Enabled = false;
             wmiProcess.EndProcessRetrieval();
-           //need to work on proper garbage collection
+            //need to work on proper garbage collection
             this.wmiProcess = null;
 
             foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
@@ -60,12 +63,15 @@ namespace Seniordesign
 
                 Console.WriteLine(g.Processes.ToString());
             }
-        
+
+            this.Load_Results_Into_Excel.Visible = true;
         }
 
         private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Load results to excel");
+            this.Load_Results_Into_Excel.Visible = false;
+            ExcelWorker.ViewResultsInExcel(gamerCache);
+            Console.WriteLine("Load results to excel");         
         }
     }
 }

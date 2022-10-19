@@ -1,4 +1,4 @@
-﻿namespace Seniordesign
+﻿namespace DataClasses_Enums
 {
     public class Process
     {
@@ -9,5 +9,7 @@
         public System.DateTime Time { get; set; }
 
         public bool Starting { get; set; }
+
+        public string ExecPath { get; set; }
     }
 }

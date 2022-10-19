@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Management;
 using System.Windows.Forms;
+using DataClasses_Enums;
 
-namespace Seniordesign
+
+namespace Seniordesign.Processes_Workers
 {
     class WMIPrcocess
     {
@@ -47,17 +49,20 @@ namespace Seniordesign
         {
             try
             {
-               ///  foreach (Gamer g in gamerCache.GamerDictionary.Values)
+                ///  foreach (Gamer g in gamerCache.GamerDictionary.Values)
                 //{
-                   // processesGathered = false;
+                // processesGathered = false;
 
-                    ManagementObjectSearcher searcher =
+                string searchQuery = "SELECT Caption, ProcessID, ExecutablePath FROM Win32_Process";
+               // string searchQuery = "SELECT * FROM Win32_Process";
+                ManagementObjectSearcher searcher =
                         new ManagementObjectSearcher("root\\Cimv2",
-                        "SELECT * FROM Win32_Process");
+                        searchQuery);
 
                     foreach (ManagementObject queryObj in searcher.Get())
                     {
-                        Process tempProcess = new Process();
+                   
+                        Process tempProcess = new DataClasses_Enums.Process();
                         Console.WriteLine("-----------------------------------");
                         Console.WriteLine("Win32_Process instance");
                         Console.WriteLine("-----------------------------------");
@@ -66,6 +71,8 @@ namespace Seniordesign
                         tempProcess.Time = DateTime.Now;
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = queryObj["PROCESSID"]?.ToString();
+                        tempProcess.ExecPath = queryObj["ExecutablePath"]?.ToString() != null ? queryObj["ExecutablePath"]?.ToString()  : "path not available";
+                    
                     if (g.Processes == null)
                     {
                         g.Processes = new List<Process>();
@@ -88,6 +95,7 @@ namespace Seniordesign
             try
             {
                 string queryString = "SELECT * FROM __InstanceCreationEvent WITHIN .025 WHERE TargetInstance ISA 'Win32_Process'";
+      
                 var startWatch = new ManagementEventWatcher(@"\\.\root\CIMV2",queryString);
                 // startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
                 startWatch.EventArrived += (sender, eventArgs) =>
@@ -100,13 +108,14 @@ namespace Seniordesign
                         }
                         var proc = GetProcessInfo(eventArgs);
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("+{0} {1} ({2}) {3} [{4}]",g.Name, proc.ProcessName, proc.PID, proc.CommandLine, proc.User);
+                        Console.WriteLine("+{0} {1} {2} ({3}) {4} [{5}]",g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
                         //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
                         Process tempProcess = new Process();
                         tempProcess.ProcessName = proc.ProcessName;
-                        tempProcess.Time = DateTime.Now;
+                        tempProcess.Time = proc.TimeCreated;
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = proc.PID;
+                        tempProcess.ExecPath = proc.ExecPath;
                         g.Processes.Add(tempProcess);
                                        
                       
@@ -157,9 +166,15 @@ namespace Seniordesign
             ProcessInfo p = new ProcessInfo();
             try
             {
-                var targetInstance = ((System.Management.ManagementBaseObject)e.NewEvent.Properties["TargetInstance"].Value);
-                p.ProcessName = targetInstance.Properties["Caption"].Value.ToString();
-                p.PID = targetInstance.Properties["ProcessId"].Value.ToString();
+                var targetInstance = ((System.Management.ManagementBaseObject)e.NewEvent?.Properties["TargetInstance"]?.Value);
+                p.ProcessName = targetInstance?.Properties["Caption"]?.Value?.ToString();
+                p.PID = targetInstance?.Properties["ProcessId"]?.Value?.ToString();
+                p.ExecPath = targetInstance?.Properties["ExecutablePath"]?.Value?.ToString() != null
+                    ? targetInstance?.Properties["ExecutablePath"]?.Value?.ToString()
+                    : "Path Not Available";
+                //todo convert uint64 for timecreated
+                // p.TimeCreated = DateTime.FromBinary((Int64)e.NewEvent?.Properties["TIME_CREATED"]?.Value);
+                p.TimeCreated = DateTime.Now;
             }
 
             catch (Exception ex) { throw ex; }
@@ -190,8 +205,10 @@ namespace Seniordesign
             public string ProcessName { get; set; }
             public string PID { get; set; }
             public string CommandLine { get; set; }
+            public string ExecPath { get; set; }
             public string UserName { get; set; }
             public string UserDomain { get; set; }
+            public DateTime TimeCreated { get; set; }
             public string User
             {
                 get
