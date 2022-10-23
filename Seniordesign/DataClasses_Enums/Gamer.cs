@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Seniordesign.DataClasses_Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataClasses_Enums
+namespace Seniordesign.DataClasses_Enums
 {
     class Gamer
     {
@@ -17,6 +18,8 @@ namespace DataClasses_Enums
         public string Game_Executable { get; set; }
         public List<Process> Processes { get; set; } = new List<Process>();
 
-        public List<string> ExceptionLog { get; set; } = new List<string>();
+        public bool Connected { get; set; } = false;
+
+        public List<LogItem> ExceptionLog { get; set; } = new List<LogItem>();
     }
 }

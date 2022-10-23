@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Seniordesign
 {
-    class GamerCache
+    class BadProcessCache
     {
-       public Dictionary<String, Gamer> GamerDictionary = new Dictionary<string, Gamer>();
+       public List<string> BadProcesses = new List<string>();
     }
 }

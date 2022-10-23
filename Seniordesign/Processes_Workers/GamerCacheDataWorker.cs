@@ -1,4 +1,4 @@
-﻿using DataClasses_Enums;
+﻿using Seniordesign.DataClasses_Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,21 +36,23 @@ namespace Seniordesign.Processes_Workers
             }
                 return exclusiveProcessNames;
         }
-        public static List<string> GetBadProcessNames(string gamerName, GamerCache gc)
+        public static List<string> GetBadProcessNames(string gamerName, GamerCache gc, BadProcessCache bpc)
         {
-            List<string> badProcesses = new List<string>();
+            List<string> gamersBadProcesses = new List<string>();
             List<string> targetGamerProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt => pt.Time).Select(p => p.ProcessName).Distinct().ToList();
             foreach(string s in targetGamerProcessNameList)
             {
                 string ps = s;
-                ps.Replace(" ", "");
-                ps.Replace(".exe", "");
-              if(Enum.IsDefined(typeof(BadProcesses),ps))
+                ps = ps.Replace(" ", "");
+                ps =  ps.Replace(".exe", "");
+                ps = ps.ToLower();
+                ps = ps.Trim();
+              if(bpc.BadProcesses.Contains(ps))
                 {
-                    badProcesses.Add(s);
+                    gamersBadProcesses.Add(s);
                 }
             }
-            return badProcesses;
+            return gamersBadProcesses;
         }
 
         public static List<string> GetFirstInstanceTimeList(string gamerName, GamerCache gc)
@@ -63,7 +65,7 @@ namespace Seniordesign.Processes_Workers
             {
                 string targetProcessTime = "no time available";
                 Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.FirstOrDefault(pr => pr.ProcessName == p);
-                targetProcessTime = proc.Time.ToString() ?? targetProcessTime;
+                targetProcessTime = proc.Time.ToString("hh:mm:ss:ff") ?? targetProcessTime;
                 firstInstanceTimeList.Add(targetProcessTime);
             }
             return firstInstanceTimeList;
@@ -83,6 +85,13 @@ namespace Seniordesign.Processes_Workers
                 processPathList.Add(targetProcessPath);
             }
             return processPathList;
+        }
+
+        public static List<LogItem> GetLogsForGamer(string gamerName, GamerCache gc)
+        {
+            List<LogItem> targetGamerLogList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).ExceptionLog.OrderBy(li => li.Time).ToList();
+            return targetGamerLogList;
+
         }
     }
 }
