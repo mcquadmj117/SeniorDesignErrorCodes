@@ -1,4 +1,4 @@
-﻿using DataClasses_Enums;
+﻿using Seniordesign.DataClasses_Enums;
 using Seniordesign.Processes_Workers;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace Seniordesign
     public partial class Form1 : Form
     {
         GamerCache gamerCache = new GamerCache();
+        BadProcessCache bpc = new BadProcessCache();
         WMIPrcocess wmiProcess;
 
         public Form1()
@@ -25,7 +26,8 @@ namespace Seniordesign
         private void load_Click(object sender, EventArgs e)
         {
             //will probably want to load list of banned processes here
-            gamerCache = ExcelWorker.LoadGamersFromExcel(gamerCache);
+            bpc = FileWorker.LoadBadProcesses(bpc);
+            gamerCache = FileWorker.LoadGamersFromExcel(gamerCache);
             if (gamerCache.GamerDictionary.Count > 0)
             {
                 this.button1.Visible = true;
@@ -70,7 +72,7 @@ namespace Seniordesign
         private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
         {
             this.Load_Results_Into_Excel.Visible = false;
-            ExcelWorker.ViewResultsInExcel(gamerCache);
+            FileWorker.ViewResultsInExcel(gamerCache,bpc);
             Console.WriteLine("Load results to excel");         
         }
     }

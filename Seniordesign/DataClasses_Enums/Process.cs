@@ -1,4 +1,4 @@
-﻿namespace DataClasses_Enums
+﻿namespace Seniordesign.DataClasses_Enums
 {
     public class Process
     {

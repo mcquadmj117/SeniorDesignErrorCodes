@@ -1,4 +1,4 @@
-﻿using DataClasses_Enums;
+﻿using Seniordesign.DataClasses_Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,8 +11,31 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Seniordesign.Processes_Workers
 {
-    class ExcelWorker
+    class FileWorker
     {
+        public static BadProcessCache LoadBadProcesses(BadProcessCache badProcesses)
+        {
+            string filepath = Directory.GetCurrentDirectory() + "\\CSVFiles\\BadProcesses.csv";
+            string[] lines = System.IO.File.ReadAllLines(filepath);
+            foreach (string line in lines)
+            {
+                string[] columns = line.Split(',');
+                foreach (string column in columns)
+                {
+                    if (!string.IsNullOrWhiteSpace(column)) { }
+                    string badProcessString = column;
+                    badProcessString = badProcessString.Replace(" ", "");
+                    badProcessString = badProcessString.Replace(".exe", "");
+                    badProcessString = badProcessString.ToLower();
+                    badProcessString = badProcessString.Trim();
+
+
+                    badProcesses.BadProcesses.Add(badProcessString);
+                }
+            }
+            return badProcesses;
+        }
+
         public static GamerCache LoadGamersFromExcel(GamerCache gamerCache)
         {
 
@@ -91,10 +114,12 @@ namespace Seniordesign.Processes_Workers
 
                             }
                         }
-                        gamerCache.GamerDictionary.Add(g.Name, g);
+                        
+                            gamerCache.GamerDictionary.Add(g.Name, g);
+                        
                     }
                 }
-                catch (System.Exception ex)
+                catch (System.Exception)
                 {
                     throw;
                 }
@@ -121,7 +146,9 @@ namespace Seniordesign.Processes_Workers
             return gamerCache;
         }
 
-        public static GamerCache ViewResultsInExcel(GamerCache gamerCache)
+
+
+        public static GamerCache ViewResultsInExcel(GamerCache gamerCache, BadProcessCache bpc)
         {
             try
             {
@@ -142,7 +169,10 @@ namespace Seniordesign.Processes_Workers
                             worksheet.Cells[1, 2].Value = "First_Instance_Time";
                             worksheet.Cells[1, 3].Value = "Process_Executable_Path";
                             worksheet.Cells[1, 4].Value = "Participant_Exclusive_Processes_Ran";
-                            worksheet.Cells[1, 5].Value = "Identified_Bad_Processes(Does Not Work)";
+                            worksheet.Cells[1, 5].Value = "Identified_Bad_Processes";
+                            worksheet.Cells[1, 6].Value = "Log and Errors";
+                            worksheet.Cells[1, 7].Value = "Time of Log/Error";
+
 
                             //getting distinct Process Names 
                             List<string> tempStringList = GamerCacheDataWorker.GetDistinctProcessesNames(g.Name, gamerCache);
@@ -173,11 +203,35 @@ namespace Seniordesign.Processes_Workers
 
 
                             //does not work right now
-                            tempStringList = GamerCacheDataWorker.GetBadProcessNames(g.Name, gamerCache);
+                            tempStringList = GamerCacheDataWorker.GetBadProcessNames(g.Name, gamerCache, bpc);
                             for (int i = 2; i < tempStringList.Count + 2; i++)
                             {
                                 worksheet.Cells[i, 5].Value = tempStringList[i - 2];
                             }
+
+                            //does not work right now
+                           // tempStringList 
+                              List<LogItem> logList  = GamerCacheDataWorker.GetLogsForGamer(g.Name, gamerCache).ToList();
+                            for (int i = 2; i < logList.Count + 2; i++)
+                            {
+                                worksheet.Cells[i, 6].Value = logList[i - 2].LogMessage;
+                                if(logList[i - 2].GoodLog)
+                                {
+                                    worksheet.Cells[i, 6].Interior.Color = Excel.XlRgbColor.rgbLightGreen;                                  
+                                }
+                                else
+                                {
+                                    worksheet.Cells[i, 6].Interior.Color = Excel.XlRgbColor.rgbPink;
+                                }
+                                worksheet.Cells[i, 7].Value = logList[i - 2].Time.ToString("hh:mm:ss:ff");
+                            }
+
+                            //tempStringList = GamerCacheDataWorker.GetLogsForGamer(g.Name, gamerCache).Select(li => li.Time.ToString("hh:mm:ss:ff")).ToList();
+                            //for (int i = 2; i < tempStringList.Count + 2; i++)
+                            //{
+                            //    worksheet.Cells[i, 7].Value = tempStringList[i - 2];
+                            //    if()
+                            //}
 
                             Console.WriteLine("created sheet for " + g.Name );
                            
