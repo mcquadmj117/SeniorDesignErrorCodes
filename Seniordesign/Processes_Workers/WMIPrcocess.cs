@@ -52,9 +52,8 @@ namespace Seniordesign.Processes_Workers
             {
                 t.Start();
             }
-            Console.WriteLine("Waiting for process events");
+        
          
-
             #region WORKING LOCAL WMI STARTUP FUNCTIONS
             //// this.gamerCache = gamerCache;
             //foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
@@ -114,25 +113,24 @@ namespace Seniordesign.Processes_Workers
                     }
                     if (scope.IsConnected)
                     {
+                        g.Connected = true;
                         LogItem connected = new LogItem();
                         connected.Time = DateTime.Now;
                         connected.GoodLog = true;
-                        connected.LogMessage = g.Name + " CONNECTED: Grabbing Current Processes";
+                        connected.LogMessage = g.Name + " CONNECTED: Grabbing Current Processes : Pulse Count: " + loopCount.ToString();
                         g.ExceptionLog.Add(connected);
-                        Console.WriteLine("Connection secure for " + g.Name + " - method :EstablishManagementScopeConnection2");
+                        Console.WriteLine(g.Name + " CONNECTED: Grabbing Current Processes");
                     }
 
                     ObjectQuery query = new ObjectQuery("SELECT Caption, ProcessID, ExecutablePath FROM Win32_Process");
                     ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query);
 
+                    int processCount = 0;
                     foreach (ManagementObject queryObj in searcher.Get())
                     {
 
                         Process tempProcess = new DataClasses_Enums.Process();
-                        Console.WriteLine("-----------------------------------");
-                        Console.WriteLine("Win32_Process instance");
-                        Console.WriteLine("-----------------------------------");
-                        Console.WriteLine("Caption: {0}", queryObj["Caption"]);
+                        
                         tempProcess.ProcessName = queryObj["Caption"].ToString();
                         tempProcess.Time = DateTime.Now;
                         tempProcess.Starting = true;
@@ -144,7 +142,11 @@ namespace Seniordesign.Processes_Workers
                             g.Processes = new List<Process>();
                         }
                         g.Processes.Add(tempProcess);
+                        processCount++;
+           
                     }
+
+                    Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
 
                     if (loopCount >= 0 && loopCount < 10 && !this.endProcessRetrieval)
                     {
@@ -168,12 +170,14 @@ namespace Seniordesign.Processes_Workers
             }
             catch (Exception ex)
             {
+                g.Connected = false;
                 LogItem li = new LogItem();
-                li.LogMessage = "Process Retrieval Failed Due to error: " + ex.Message + "setting pulse convention count to 0";
+                var message = "Process Retrieval for " +g.Name+ " :( Failed Due to error: " + ex.Message + "setting pulse convention count to 0";
+                li.LogMessage = message;
                 li.Time = DateTime.Now;
                 g.ExceptionLog.Add(li);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("eating exception" + ex.ToString());
+                Console.WriteLine("Process Retrieval for " + g.Name + " :( Failed Due to error: " + ex.Message + "setting pulse convention count to 0");
+       
                 Thread.Sleep(5000);
                 EstablishInitialManagementScopeConnection(g, 0);
 
@@ -215,8 +219,10 @@ namespace Seniordesign.Processes_Workers
                         LogItem connected = new LogItem();
                         connected.Time = DateTime.Now;
                         connected.GoodLog = true;
-                        connected.LogMessage = g.Name + "CONNECTED Attempting Process Watch";
+                        connected.LogMessage = g.Name + " CONNECTED  Process Watching";
+                        g.Connected = true;
                         g.ExceptionLog.Add(connected);
+                        g.Connected = true;
                     }
 
 
@@ -235,7 +241,8 @@ namespace Seniordesign.Processes_Workers
                         }
                         var proc = GetProcessInfo(eventArgs);
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("+{0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
+                        Console.WriteLine("Retrieved Process From watch:"); 
+                       Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
                     //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
                     Process tempProcess = new Process();
                         tempProcess.ProcessName = proc.ProcessName;
@@ -249,19 +256,19 @@ namespace Seniordesign.Processes_Workers
 
 
                     startWatch.Start();
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("+ Started Process in GREEN");
+        
+               
 
                 }
                 }
             catch (Exception ex)
             {
+                g.Connected = false;
                 LogItem li = new LogItem();
-                li.LogMessage = "switching to pulse convention due to following error:: " + ex.Message;
+                li.LogMessage = "watch failed for " + g.Name+ " , switching to pulse convention due to following error:: " + ex.Message;
                 li.Time = DateTime.Now;
                 g.ExceptionLog.Add(li);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("eating exception" + ex.ToString());
+                Console.WriteLine("watch failed for " + g.Name + " , switching to pulse convention due to following error:: " + ex.Message);
                 Thread.Sleep(5000);
                 EstablishInitialManagementScopeConnection(g, 0);
             }
