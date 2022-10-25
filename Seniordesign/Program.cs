@@ -17,6 +17,8 @@ namespace Seniordesign
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            //may want to do initial directory and file setup here
+
             Application.Run(new Form1());
 
         }

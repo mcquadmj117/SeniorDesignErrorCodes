@@ -13,6 +13,11 @@ namespace Seniordesign.Processes_Workers
 {
     class FileWorker
     {
+        //TODO these can be used later to set consistent paths at class level and give user feedcback on file locations in interface
+        public string ExcelStarterFile = "";
+        public string ExcelOutOutFile = "";
+        public string BadProcessInputFile = "";
+
         public static BadProcessCache LoadBadProcesses(BadProcessCache badProcesses)
         {
             string filepath = Directory.GetCurrentDirectory() + "\\CSVFiles\\BadProcesses.csv";
