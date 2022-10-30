@@ -35,6 +35,7 @@ namespace Seniordesign
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.Load_Results_Into_Excel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.End_Session = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // load
@@ -91,17 +92,30 @@ namespace Seniordesign
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(526, 89);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
+            this.label1.Location = new System.Drawing.Point(26, 69);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(51, 13);
+            this.label1.Size = new System.Drawing.Size(77, 20);
             this.label1.TabIndex = 5;
             this.label1.Text = "InfoLabel";
+            // 
+            // End_Session
+            // 
+            this.End_Session.Location = new System.Drawing.Point(958, 392);
+            this.End_Session.Name = "End_Session";
+            this.End_Session.Size = new System.Drawing.Size(97, 38);
+            this.End_Session.TabIndex = 6;
+            this.End_Session.Text = "End_Session";
+            this.End_Session.UseVisualStyleBackColor = true;
+            this.End_Session.Visible = false;
+            this.End_Session.Click += new System.EventHandler(this.End_Session_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1126, 453);
+            this.Controls.Add(this.End_Session);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Load_Results_Into_Excel);
             this.Controls.Add(this.listBox1);
@@ -123,6 +137,7 @@ namespace Seniordesign
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button Load_Results_Into_Excel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button End_Session;
     }
 }
 

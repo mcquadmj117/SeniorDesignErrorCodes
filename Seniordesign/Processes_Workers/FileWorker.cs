@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,10 +14,91 @@ namespace Seniordesign.Processes_Workers
 {
     class FileWorker
     {
-        //TODO these can be used later to set consistent paths at class level and give user feedcback on file locations in interface
-        public string ExcelStarterFile = "";
-        public string ExcelOutOutFile = "";
-        public string BadProcessInputFile = "";
+
+        //public string ExcelStarterFile = "";
+        //public string ExcelOutOutFile = "";
+        //public string BadProcessInputFile = "";
+
+        public static string CreateInitialDirectoryWithFiles()
+        {
+            try
+            {
+                string newFolder = "ErrorCodes";
+                string path = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                newFolder);
+                if (!System.IO.Directory.Exists(path))
+                {
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(path);
+                    }
+                    catch (IOException ie)
+                    {
+                        throw;
+                    }               
+                }
+                if (!File.Exists(path + "\\ErrorCodesStartingFile.xlsx")) {
+                    Excel.Application excelApp = new Excel.Application();
+                    if (excelApp == null)
+                    {
+                        MessageBox.Show("Excel is not properly installed!!");
+                        return "";
+                    }
+                    object misValue = System.Reflection.Missing.Value;
+                    Excel.Workbook workbook = excelApp.Workbooks.Add(misValue);
+                    var sheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
+                    try
+                    {
+
+                        sheet.Cells[1, 1].Value = "Name(Must Be unique)";
+                        sheet.Cells[1, 2].Value = "Computer_Name";
+                        sheet.Cells[1, 3].Value = "IP_Address(optional)";
+                        sheet.Cells[1, 4].Value = "Username";
+                        sheet.Cells[1, 5].Value = "Password";
+                        sheet.Cells[1, 6].Value = "Game_Executable";
+                        sheet.Cells[1, 7].Value = "Inserted_Processes(seperate by comma)";
+                        sheet.Columns.AutoFit();
+                        sheet.Rows.AutoFit();
+                        
+   
+
+
+                        workbook.SaveAs(path + "\\ErrorCodesStartingFile.xlsx");
+
+                        workbook.Close(true, misValue, misValue);
+                    }
+
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        excelApp.Quit();
+
+                        Marshal.ReleaseComObject(sheet);
+                        Marshal.ReleaseComObject(workbook);
+                        Marshal.ReleaseComObject(excelApp);
+                    }
+                }
+
+                if(File.Exists(path + "\\ErrorCodesStartingFile.xlsx")){                   
+                    return (path + "\\ErrorCodesStartingFile.xlsx");
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine( e.Message);
+                return "";
+            }
+
+    
+        }
 
         public static BadProcessCache LoadBadProcesses(BadProcessCache badProcesses)
         {
@@ -44,12 +126,6 @@ namespace Seniordesign.Processes_Workers
         public static GamerCache LoadGamersFromExcel(GamerCache gamerCache)
         {
 
-
-            // using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "Excel 97-2003 Workbook|*.xls|Excel Workbook|*.xlsx" })
-            //{
-            //if (ofd.ShowDialog() == DialogResult.OK)
-            // {
-
             try { 
                
                 Excel.Application ExcelApp = new Excel.Application();
@@ -62,9 +138,14 @@ namespace Seniordesign.Processes_Workers
                     return gamerCache;
                 }
 
-                string filepath = Directory.GetCurrentDirectory() + "\\ExcelFiles\\Seniordesign.xlsx";
 
-                Excel.Workbook workbook = ExcelApp.Workbooks.Open(filepath);
+                string path = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                "ErrorCodes");
+
+                path = path + "\\ErrorCodesStartingFile.xlsx";
+
+                Excel.Workbook workbook = ExcelApp.Workbooks.Open(path);
 
                 Excel._Worksheet worksheet = workbook.Sheets[1];
            
@@ -89,34 +170,32 @@ namespace Seniordesign.Processes_Workers
                                     g.Computer_Name = range.Cells[i, j]?.Value2?.ToString() ?? "";
                                     break;
                                 case 3:
-                                    g.Mac_Address = range.Cells[i, j].Value2.ToString() ?? "";
-                                    break;
-                                case 4:
                                     g.IP_Address = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
-                                case 5:
+                                case 4:
                                     g.Username = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
-                                case 6:
+                                case 5:
                                     g.Password = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
-                                case 7:
+                                case 6:
                                     g.Game_Executable = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
-                                case 8:
-                                    List<string> processNames = new List<string>();
+                                case 7:
+                                    string processNames = "";
+                                    List<string> processStrings = new List<string>();
                                     if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
                                     {
-                                        processNames = new List<string> { range.Cells[i, j]?.Value2?.ToString() };
+                                        processNames =  range.Cells[i, j]?.Value2?.ToString();
+                                        processStrings = processNames.Split(',').ToList();
                                     }
-                                    //to refactor to get a list of processes
-                                    List<Process> processes = new List<Process>();
-                                    foreach (string pn in processNames)
+                                 
+                                                     
+                                    foreach (string pn in processStrings)
                                     {
                                         g.Processes.Add(new Process { ProcessName = pn });
                                     }
-                                    break;
-
+                                    break;                                
                             }
                         }
                         
@@ -151,18 +230,37 @@ namespace Seniordesign.Processes_Workers
             return gamerCache;
         }
 
-
-
-        public static GamerCache ViewResultsInExcel(GamerCache gamerCache, BadProcessCache bpc)
+        public static string ViewResultsInExcel(GamerCache gamerCache, BadProcessCache bpc)
         {
+
+            string fileCreatedPath = "";
+
             try
             {
-                int fileNum = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\ExcelFiles").Length;
+
+                string startPath = System.IO.Path.Combine(
+              Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+              "ErrorCodes");
+
+                string resultPath = System.IO.Path.Combine(startPath, "Results");
+
+                if (!Directory.Exists(resultPath))
+                {
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(resultPath);
+                    }
+                    catch (IOException ie)
+                    {
+                        throw;
+                    }
+                }
+
+                    int fileNum = Directory.GetFiles(resultPath).Length;
                 Excel.Application ExcelApp = new Excel.Application();
 
-                string filepath = Directory.GetCurrentDirectory() + "\\ExcelFiles\\Seniordesign.xlsx";
 
-                Excel.Workbook workbook = ExcelApp.Workbooks.Open(filepath);
+                Excel.Workbook workbook = ExcelApp.Workbooks.Open(startPath + "\\ErrorCodesStartingFile.xlsx");
                 try {
                     foreach (Gamer g in gamerCache.GamerDictionary.Values)
                     {
@@ -248,9 +346,10 @@ namespace Seniordesign.Processes_Workers
                         finally {
                             //  workbook.SaveAs(newFilePath, Excel.XlFileFormat.xlWorkbookNormal, "", "", false, false,
                             // Excel.XlSaveAsAccessMode.xlNoChange, Excel.XlSaveConflictResolution.xlUserResolution, true, "", "", "");
-                           
-                            string newFilePath = Directory.GetCurrentDirectory() + "\\ExcelFiles\\SeniordesignResults"+fileNum.ToString() +".xlsx";
-                            workbook.SaveAs(newFilePath);
+                            worksheet.Columns.AutoFit();
+                            worksheet.Rows.AutoFit();
+                            fileCreatedPath = resultPath + "\\ErrorCodeResults"+fileNum.ToString() +".xlsx";
+                            workbook.SaveAs(fileCreatedPath);
                             System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
                         }
                   
@@ -262,8 +361,8 @@ namespace Seniordesign.Processes_Workers
                 finally
                 {
                                
-                    string newFilePath = Directory.GetCurrentDirectory() + "\\ExcelFiles\\SeniordesignResults" + fileNum.ToString() + ".xlsx";
-                    workbook.SaveAs(newFilePath);
+                    fileCreatedPath = resultPath + "\\ErrorCodeResults" + fileNum.ToString() + ".xlsx";
+                    workbook.SaveAs(fileCreatedPath);
 
 
                     //close and release
@@ -281,7 +380,8 @@ namespace Seniordesign.Processes_Workers
                 Console.WriteLine(ex.Message);
             }
             //todo gamercache to excel
-            return gamerCache;
+            return fileCreatedPath;
         }
+
     }
 }
