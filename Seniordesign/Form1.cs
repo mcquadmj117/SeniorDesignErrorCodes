@@ -27,7 +27,17 @@ namespace Seniordesign
         public Form1()
         {
             InitializeComponent();
-            this.label1.Text = "Welcome to our senior design project: Click load to load the gamers from excel sheet into cache";
+            string startFilePath = FileWorker.CreateInitialDirectoryWithFiles();
+
+            if (startFilePath != "" && startFilePath != null)
+            {
+                this.label1.Text = "Welcome to our senior design project: \n your start file will be located at  " + startFilePath + " \n Please open this file and verify your initial values are set correctly";
+            }
+            else
+            {
+                this.label1.Text = "trouble loading start file";
+            }
+
         }
 
         private void load_Click(object sender, EventArgs e)
@@ -154,11 +164,24 @@ namespace Seniordesign
         private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
         {
             this.Load_Results_Into_Excel.Visible = false;
-            FileWorker.ViewResultsInExcel(gamerCache,bpc);
+            string fileCreated = FileWorker.ViewResultsInExcel(gamerCache,bpc);
             Console.WriteLine("Load results to excel");
-            this.label1.Text = "Results loaded, session complete. You may exit form application now";
+            if (fileCreated != null && fileCreated != "")
+            {
+                this.label1.Text = "Results have been loaded succesfully, \n you can view these results at " + fileCreated + ". \n Session complete. You may exit form application now";
+            }
+            else
+            {
+                this.label1.Text = "trouble loading results to excel file";
+            }
+
+            this.End_Session.Visible = true;
         }
 
-     
+        private void End_Session_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Application.Exit();
+        }
+    
     }
 }

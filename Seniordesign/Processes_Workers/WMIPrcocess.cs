@@ -13,15 +13,15 @@ namespace Seniordesign.Processes_Workers
 {
     class WMIPrcocess
     {
-        //private GamerCache gamerCache;
-
+        public delegate void WatchProc(Gamer g);
+    
         public bool endProcessRetrieval = false;
 
         public List<Thread> threadList = new List<Thread>();
 
         public WMIPrcocess(GamerCache gamerCache)
         {
-     
+
             //foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
             //{
             //    try
@@ -39,8 +39,10 @@ namespace Seniordesign.Processes_Workers
             //    }
             //}
 
-       
+
             // Thread threadObject = new Thread(RunProcessWatching);
+
+     
             foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
             {
                 threadList.Add(new Thread(() => EstablishInitialManagementScopeConnection(gamer)) { IsBackground = true, Name = gamer.Name });
@@ -52,8 +54,9 @@ namespace Seniordesign.Processes_Workers
             {
                 t.Start();
             }
-        
-         
+
+
+
             #region WORKING LOCAL WMI STARTUP FUNCTIONS
             //// this.gamerCache = gamerCache;
             //foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
@@ -81,8 +84,6 @@ namespace Seniordesign.Processes_Workers
             #endregion
         }
 
-
-
         private void EstablishInitialManagementScopeConnection(Gamer g, int loopCount = -1, ManagementScope scope = null)
         {
             try
@@ -91,8 +92,6 @@ namespace Seniordesign.Processes_Workers
                 {
                     if (scope == null || !scope.IsConnected)
                     {
-
-
 
                         string myCompName = System.Environment.MachineName;
 
@@ -103,7 +102,7 @@ namespace Seniordesign.Processes_Workers
                             options.Username = g.Username;
                         }
 
-
+                        options.EnablePrivileges = true;
                         options.Impersonation = System.Management.ImpersonationLevel.Impersonate;
                         string machineName = g.Computer_Name;
 
@@ -164,6 +163,7 @@ namespace Seniordesign.Processes_Workers
                             li.Time = DateTime.Now;
                             g.ExceptionLog.Add(li);
                         }
+
                         RunProcessWatching(g);
                     }
                 }
@@ -189,10 +189,10 @@ namespace Seniordesign.Processes_Workers
         {            
                 try
                 {
-
+                
                 if (!this.endProcessRetrieval)
                 {
-
+                   
                     string myCompName = System.Environment.MachineName;
 
                     ConnectionOptions options = new ConnectionOptions();
@@ -202,9 +202,9 @@ namespace Seniordesign.Processes_Workers
                         options.Username = g.Username;
                     }
 
-
                     options.Impersonation = System.Management.ImpersonationLevel.Impersonate;
-                    //  options.Authentication = AuthenticationLevel.Packet;
+                    options.EnablePrivileges = true;
+
 
                     string machineName = g.Computer_Name;
 
@@ -228,39 +228,38 @@ namespace Seniordesign.Processes_Workers
 
                     EventQuery queryString = new EventQuery("SELECT * FROM __InstanceCreationEvent WITHIN .025 WHERE TargetInstance ISA 'Win32_Process'");
 
-                    // EventQuery queryString = new EventQuery("SELECT * FROM Win32_ProcessStartTrace");
+                  
 
-                    var startWatch = new ManagementEventWatcher(scope, queryString);
-                    // startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
-                    startWatch.EventArrived += (sender, eventArgs) =>
+                    ManagementEventWatcher watcher =
+               new ManagementEventWatcher(scope, queryString);
+                    //startWatch.Start();
+                    ManagementBaseObject e = null;
+                    while (!this.endProcessRetrieval)
                     {
-
-                        if (this.endProcessRetrieval)
-                        {
-                            startWatch.Stop();
-                        }
-                        var proc = GetProcessInfo(eventArgs);
+                       
+                            e = watcher.WaitForNextEvent();
+                        
+                        var proc = GetProcessInfo(e);
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Retrieved Process From watch:"); 
-                       Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
-                    //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
-                    Process tempProcess = new Process();
+                        Console.WriteLine("Retrieved Process From watch:");
+                        Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
+                        //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
+                        Process tempProcess = new Process();
                         tempProcess.ProcessName = proc.ProcessName;
                         tempProcess.Time = proc.TimeCreated;
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = proc.PID;
                         tempProcess.ExecPath = proc.ExecPath;
                         g.Processes.Add(tempProcess);
-                    };
+                    }
 
-
-
-                    startWatch.Start();
-        
-               
+                    if (this.endProcessRetrieval)
+                    {
+                        watcher.Stop();
+                    }
 
                 }
-                }
+            }
             catch (Exception ex)
             {
                 g.Connected = false;
@@ -274,25 +273,31 @@ namespace Seniordesign.Processes_Workers
             }
         }
 
-      
-        static ProcessInfo GetProcessInfo(EventArrivedEventArgs e)
+        static ProcessInfo GetProcessInfo(ManagementBaseObject mbo)
         {
             ProcessInfo p = new ProcessInfo();
-            try
+            if (mbo != null)
             {
-                var targetInstance = ((System.Management.ManagementBaseObject)e.NewEvent?.Properties["TargetInstance"]?.Value);
-                p.ProcessName = targetInstance?.Properties["Caption"]?.Value?.ToString();
-                p.PID = targetInstance?.Properties["ProcessId"]?.Value?.ToString();
-                p.ExecPath = targetInstance?.Properties["ExecutablePath"]?.Value?.ToString() != null
-                    ? targetInstance?.Properties["ExecutablePath"]?.Value?.ToString()
-                    : "Path Not Available";
-                //todo convert uint64 for timecreated
-                // p.TimeCreated = DateTime.FromBinary((Int64)e.NewEvent?.Properties["TIME_CREATED"]?.Value);
-                p.TimeCreated = DateTime.Now;
-            }
 
-            catch (Exception ex) { throw ex; }
+
+                try
+                {
+                    var targetInstance = (System.Management.ManagementBaseObject)mbo.Properties["TargetInstance"]?.Value;
+                    p.ProcessName = targetInstance?.Properties["Caption"]?.Value?.ToString();
+                    p.PID = targetInstance?.Properties["ProcessId"]?.Value?.ToString();
+                    p.ExecPath = targetInstance?.Properties["ExecutablePath"]?.Value?.ToString() != null
+                        ? targetInstance?.Properties["ExecutablePath"]?.Value?.ToString()
+                        : "Path Not Available";
+                    //todo convert uint64 for timecreated
+                    // p.TimeCreated = DateTime.FromBinary((Int64)e.NewEvent?.Properties["TIME_CREATED"]?.Value);
+                    p.TimeCreated = DateTime.Now;
+                }
+                catch (Exception ex) { throw ex; }
+               
+            }
             return p;
+
+
         }
 
         public void EndProcessRetrieval()
