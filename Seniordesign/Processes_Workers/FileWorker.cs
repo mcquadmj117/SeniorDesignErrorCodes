@@ -40,6 +40,7 @@ namespace Seniordesign.Processes_Workers
                 }
                 if (!File.Exists(path + "\\ErrorCodesStartingFile.xlsx")) {
                     Excel.Application excelApp = new Excel.Application();
+                    excelApp.DisplayAlerts = false;
                     if (excelApp == null)
                     {
                         MessageBox.Show("Excel is not properly installed!!");
@@ -58,15 +59,32 @@ namespace Seniordesign.Processes_Workers
                         sheet.Cells[1, 5].Value = "Password";
                         sheet.Cells[1, 6].Value = "Game_Executable";
                         sheet.Cells[1, 7].Value = "Inserted_Processes(seperate by comma)";
+             
+                        Excel.Range rng = sheet.Range["A1:G1"];
+
+                        rng.Style.Font.Bold = true;
+                        rng.Style.Font.Size = 13;
+                        rng.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+
+
+                        rng.Interior.Color = Excel.XlRgbColor.rgbLightSkyBlue;
+             
+                        rng.Style.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                        rng.Style.VerticalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                        rng.Style.ShrinkToFit = false;
+
                         sheet.Columns.AutoFit();
                         sheet.Rows.AutoFit();
-                        
-   
+                        sheet.Application.ActiveWindow.ScrollRow = 1;
+                        sheet.Application.ActiveWindow.SplitRow = 1;
+                        sheet.Application.ActiveWindow.FreezePanes = true;
 
 
                         workbook.SaveAs(path + "\\ErrorCodesStartingFile.xlsx");
 
                         workbook.Close(true, misValue, misValue);
+
+                        Marshal.ReleaseComObject(rng);
                     }
 
                     catch (Exception ex)
@@ -82,9 +100,17 @@ namespace Seniordesign.Processes_Workers
                         Marshal.ReleaseComObject(excelApp);
                     }
                 }
+                if(!File.Exists(path + "\\BadProcesses.csv"))
+                {
+                    string initialData = "cheatengine.exe, aimbot.exe, hackware.exe, cosmos.exe, wemod.exe, artmoney.exe";
+                    string filePath = path + "\\BadProcesses.csv";
+                    File.WriteAllText(filePath, initialData);
 
-                if(File.Exists(path + "\\ErrorCodesStartingFile.xlsx")){                   
-                    return (path + "\\ErrorCodesStartingFile.xlsx");
+                }
+
+                if(File.Exists(path + "\\ErrorCodesStartingFile.xlsx") && File.Exists(path + "\\BadProcesses.csv"))
+                {                   
+                    return (path + "\\ErrorCodesStartingFile.xlsx" + " and \n " + path + "\\BadProcesses.csv");
                 }
                 else
                 {
@@ -102,7 +128,13 @@ namespace Seniordesign.Processes_Workers
 
         public static BadProcessCache LoadBadProcesses(BadProcessCache badProcesses)
         {
-            string filepath = Directory.GetCurrentDirectory() + "\\CSVFiles\\BadProcesses.csv";
+            string folder = "ErrorCodes";
+          
+            string partialPath = System.IO.Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            folder);
+
+            string filepath = partialPath + "\\BadProcesses.csv";
             string[] lines = System.IO.File.ReadAllLines(filepath);
             foreach (string line in lines)
             {
@@ -116,8 +148,10 @@ namespace Seniordesign.Processes_Workers
                     badProcessString = badProcessString.ToLower();
                     badProcessString = badProcessString.Trim();
 
-
-                    badProcesses.BadProcesses.Add(badProcessString);
+                    if (!badProcesses.BadProcesses.Contains(badProcessString) && badProcessString != "" && badProcessString != null)
+                    {
+                        badProcesses.BadProcesses.Add(badProcessString);
+                    }
                 }
             }
             return badProcesses;
@@ -129,7 +163,8 @@ namespace Seniordesign.Processes_Workers
             try { 
                
                 Excel.Application ExcelApp = new Excel.Application();
-             
+                ExcelApp.DisplayAlerts = false;
+
                 if (ExcelApp == null)
                 {
                 Console.WriteLine("Excel is not installed!!");
@@ -193,7 +228,7 @@ namespace Seniordesign.Processes_Workers
                                                      
                                     foreach (string pn in processStrings)
                                     {
-                                        g.Processes.Add(new Process { ProcessName = pn });
+                                        g.AddProcessToGamer(new Process { ProcessName = pn });
                                     }
                                     break;                                
                             }
@@ -257,7 +292,13 @@ namespace Seniordesign.Processes_Workers
                 }
 
                     int fileNum = Directory.GetFiles(resultPath).Length;
+                while (File.Exists(resultPath + "\\ErrorCodeResults" + fileNum.ToString() + ".xlsx"))
+                {
+                    fileNum++;
+                }
+
                 Excel.Application ExcelApp = new Excel.Application();
+                ExcelApp.DisplayAlerts = false;
 
 
                 Excel.Workbook workbook = ExcelApp.Workbooks.Open(startPath + "\\ErrorCodesStartingFile.xlsx");
@@ -270,11 +311,31 @@ namespace Seniordesign.Processes_Workers
                             worksheet.Name = (g.Name + "_results");
                             worksheet.Cells[1, 1].Value = "All_Processes_Ran";
                             worksheet.Cells[1, 2].Value = "First_Instance_Time";
-                            worksheet.Cells[1, 3].Value = "Process_Executable_Path";
-                            worksheet.Cells[1, 4].Value = "Participant_Exclusive_Processes_Ran";
-                            worksheet.Cells[1, 5].Value = "Identified_Bad_Processes";
-                            worksheet.Cells[1, 6].Value = "Log and Errors";
-                            worksheet.Cells[1, 7].Value = "Time of Log/Error";
+                            worksheet.Cells[1, 3].Value = "Last_Instance_Time";
+                            worksheet.Cells[1, 4].Value = "Process_Executable_Path";
+                            worksheet.Cells[1, 5].Value = "Participant_Exclusive_Processes_Ran";
+                            worksheet.Cells[1, 6].Value = "Identified_Bad_Processes";
+                            worksheet.Cells[1, 7].Value = "Log and Errors";
+                            worksheet.Cells[1, 8].Value = "Time of Log/Error";
+
+                            Excel.Range rng = worksheet.Range["A1:H1"];
+
+                            rng.Style.Font.Bold = true;
+                            rng.Style.Font.Size = 13;
+                            rng.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+
+
+                            rng.Interior.Color = Excel.XlRgbColor.rgbLightSkyBlue;
+
+                            rng.Style.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                            rng.Style.VerticalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                            rng.Style.ShrinkToFit = false;
+
+                            worksheet.Columns.AutoFit();
+                            worksheet.Rows.AutoFit();
+                            worksheet.Application.ActiveWindow.ScrollRow = 1;
+                            worksheet.Application.ActiveWindow.SplitRow = 1;
+                            worksheet.Application.ActiveWindow.FreezePanes = true;
 
 
                             //getting distinct Process Names 
@@ -291,50 +352,99 @@ namespace Seniordesign.Processes_Workers
                                 worksheet.Cells[i, 2].Value = tempStringList[i - 2];
                             }
 
-                            tempStringList = GamerCacheDataWorker.GetExecPathForFirstInstances(g.Name, gamerCache);
+                            tempStringList = GamerCacheDataWorker.GetLastInstanceTimeList(g.Name, gamerCache);
                             for (int i = 2; i < tempStringList.Count + 2; i++)
                             {
                                 worksheet.Cells[i, 3].Value = tempStringList[i - 2];
                             }
 
-                            tempStringList = GamerCacheDataWorker.GetExclusiveProcessNames(g.Name, gamerCache);
+                            tempStringList = GamerCacheDataWorker.GetExecPathForFirstInstances(g.Name, gamerCache);
                             for (int i = 2; i < tempStringList.Count + 2; i++)
                             {
                                 worksheet.Cells[i, 4].Value = tempStringList[i - 2];
-                                //todo make column yellow
+                                worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeRight].LineStyle =
+          Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+
+                                worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+ 
+                                worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlThick;
+
+
+                                worksheet.Cells[i,4].HorizontalAlignment =
+                 Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft;
                             }
 
-
-                            //does not work right now
-                            tempStringList = GamerCacheDataWorker.GetBadProcessNames(g.Name, gamerCache, bpc);
+                            tempStringList = GamerCacheDataWorker.GetExclusiveProcessNames(g.Name, gamerCache);
                             for (int i = 2; i < tempStringList.Count + 2; i++)
                             {
                                 worksheet.Cells[i, 5].Value = tempStringList[i - 2];
+                                worksheet.Cells[i, 5].Interior.Color = Excel.XlRgbColor.rgbLightYellow;
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeRight].LineStyle =
+        Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                            
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeLeft].LineStyle =
+       Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeBottom].LineStyle =
+       Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlThick;
+
+                                worksheet.Cells[i, 5].Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlThick;
+
+
+
                             }
 
-                            //does not work right now
-                           // tempStringList 
+
+                            tempStringList = GamerCacheDataWorker.GetBadProcessNames(g.Name, gamerCache, bpc);
+                            for (int i = 2; i < tempStringList.Count + 2; i++)
+                            {
+                                worksheet.Cells[i, 6].Value = tempStringList[i - 2];
+                                worksheet.Cells[i, 6].Interior.Color = Excel.XlRgbColor.rgbPaleVioletRed;
+
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeRight].LineStyle =
+       Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                           
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeLeft].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeBottom].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlThick;
+                                worksheet.Cells[i, 6].Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlThick;
+
+
+                            }
+
                               List<LogItem> logList  = GamerCacheDataWorker.GetLogsForGamer(g.Name, gamerCache).ToList();
                             for (int i = 2; i < logList.Count + 2; i++)
                             {
-                                worksheet.Cells[i, 6].Value = logList[i - 2].LogMessage;
-                                if(logList[i - 2].GoodLog)
+                     
+                                worksheet.Cells[i, 7].Value = logList[i - 2].LogMessage;
+                                worksheet.Cells[i, 7].HorizontalAlignment =
+       Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignLeft;
+                                worksheet.Cells[i, 7].Borders[Excel.XlBordersIndex.xlEdgeLeft].LineStyle =
+       Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                                worksheet.Cells[i, 7].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+                                worksheet.Cells[i, 7].Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlThick;
+                         
+
+                                if (logList[i - 2].GoodLog)
                                 {
-                                    worksheet.Cells[i, 6].Interior.Color = Excel.XlRgbColor.rgbLightGreen;                                  
+                                    worksheet.Cells[i, 7].Interior.Color = Excel.XlRgbColor.rgbLightGreen;                                  
                                 }
                                 else
                                 {
-                                    worksheet.Cells[i, 6].Interior.Color = Excel.XlRgbColor.rgbPink;
+                                    worksheet.Cells[i, 7].Interior.Color = Excel.XlRgbColor.rgbPink;
                                 }
-                                worksheet.Cells[i, 7].Value = logList[i - 2].Time.ToString("hh:mm:ss:ff");
-                            }
+                                worksheet.Cells[i, 8].Value = logList[i - 2].Time.ToString("hh:mm:ss:ff");
+                                worksheet.Cells[i, 8].Borders[Excel.XlBordersIndex.xlEdgeRight].LineStyle =
+    Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                                worksheet.Cells[i, 8].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+                                worksheet.Cells[i, 8].Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlThick;
 
-                            //tempStringList = GamerCacheDataWorker.GetLogsForGamer(g.Name, gamerCache).Select(li => li.Time.ToString("hh:mm:ss:ff")).ToList();
-                            //for (int i = 2; i < tempStringList.Count + 2; i++)
-                            //{
-                            //    worksheet.Cells[i, 7].Value = tempStringList[i - 2];
-                            //    if()
-                            //}
+                            }
 
                             Console.WriteLine("created sheet for " + g.Name );
                            
@@ -347,7 +457,7 @@ namespace Seniordesign.Processes_Workers
                             //  workbook.SaveAs(newFilePath, Excel.XlFileFormat.xlWorkbookNormal, "", "", false, false,
                             // Excel.XlSaveAsAccessMode.xlNoChange, Excel.XlSaveConflictResolution.xlUserResolution, true, "", "", "");
                             worksheet.Columns.AutoFit();
-                            worksheet.Rows.AutoFit();
+                            worksheet.Rows.AutoFit();              
                             fileCreatedPath = resultPath + "\\ErrorCodeResults"+fileNum.ToString() +".xlsx";
                             workbook.SaveAs(fileCreatedPath);
                             System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);

@@ -11,19 +11,27 @@ namespace Seniordesign.Processes_Workers
     {
        public static List<string> GetDistinctProcessesNames(string gamerName, GamerCache gc)
         {
-            List<string> distinctProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt=>pt.Time).Select(p => p.ProcessName).Distinct().ToList();
+            List<string> distinctProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.Keys.ToList();
+            //foreach (List<Process> listOfProcesses in  gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.Values)
+            //{
+            //    foreach(Process p in listOfProcesses)
+            //    {
+            //        distinctProcessNameList.Add(p.ProcessName);
+            //    }
+            //}
+           //     gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.Values.OrderBy(pt=>pt.Time).Select(p => p.ProcessName).Distinct().ToList();
             return distinctProcessNameList;
         }
         public static List<string> GetExclusiveProcessNames(string gamerName, GamerCache gc) 
         {
             List<string> exclusiveProcessNames = new List<string>();
-            List<string> targetGamerProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt => pt.Time).Select(p=>p.ProcessName).Distinct().ToList();
+            List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName, gc);
             foreach (string s in targetGamerProcessNameList)
             {
                bool distinctFlag = true;
                 foreach (Gamer g in gc.GamerDictionary.Values.Where(g => g.Name != gamerName).ToList()) 
                 {
-                    if (g.Processes.Select(p => p.ProcessName).Distinct().ToList().Contains(s))
+                    if (g.Processes.Keys.ToList().Contains(s))
                     {
                         distinctFlag = false;
                     }
@@ -39,7 +47,7 @@ namespace Seniordesign.Processes_Workers
         public static List<string> GetBadProcessNames(string gamerName, GamerCache gc, BadProcessCache bpc)
         {
             List<string> gamersBadProcesses = new List<string>();
-            List<string> targetGamerProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt => pt.Time).Select(p => p.ProcessName).Distinct().ToList();
+            List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName,gc);
             foreach(string s in targetGamerProcessNameList)
             {
                 string ps = s;
@@ -59,28 +67,44 @@ namespace Seniordesign.Processes_Workers
         {
             List<string> firstInstanceTimeList = new List<string>();
 
-            List<string> targetGamerProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt => pt.Time).Select(p => p.ProcessName).Distinct().ToList();
+            List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName, gc);
          
             foreach(string p in targetGamerProcessNameList)
             {
                 string targetProcessTime = "no time available";
-                Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.FirstOrDefault(pr => pr.ProcessName == p);
+                Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes[p].First();
                 targetProcessTime = proc.Time.ToString("hh:mm:ss:ff") ?? targetProcessTime;
                 firstInstanceTimeList.Add(targetProcessTime);
             }
             return firstInstanceTimeList;
         }
 
+        public static List<string> GetLastInstanceTimeList(string gamerName, GamerCache gc)
+        {
+            List<string> lastInstanceTimeList = new List<string>();
+
+            List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName, gc);
+
+            foreach (string p in targetGamerProcessNameList)
+            {
+                string targetProcessTime = "no time available";
+                Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes[p].Last();
+                targetProcessTime = proc.Time.ToString("hh:mm:ss:ff") ?? targetProcessTime;
+                lastInstanceTimeList.Add(targetProcessTime);
+            }
+            return lastInstanceTimeList;
+        }
+
         public static List<string> GetExecPathForFirstInstances(string gamerName, GamerCache gc)
         {
             List<string> processPathList = new List<string>();
 
-            List<string> targetGamerProcessNameList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.OrderBy(pt => pt.Time).Select(p => p.ProcessName).Distinct().ToList();
+            List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName, gc);
 
             foreach (string p in targetGamerProcessNameList)
             {
                 string targetProcessPath = "no Path Available";
-                Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes.FirstOrDefault(pr => pr.ProcessName == p);
+                Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes[p].First();
                 targetProcessPath = proc.ExecPath?.ToString() ?? targetProcessPath;
                 processPathList.Add(targetProcessPath);
             }
