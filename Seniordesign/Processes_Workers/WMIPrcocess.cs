@@ -138,9 +138,9 @@ namespace Seniordesign.Processes_Workers
 
                         if (g.Processes == null)
                         {
-                            g.Processes = new List<Process>();
+                            g.Processes = new Dictionary<string, List<Process>>();
                         }
-                        g.Processes.Add(tempProcess);
+                        g.AddProcessToGamer(tempProcess);
                         processCount++;
            
                     }
@@ -250,7 +250,7 @@ namespace Seniordesign.Processes_Workers
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = proc.PID;
                         tempProcess.ExecPath = proc.ExecPath;
-                        g.Processes.Add(tempProcess);
+                        g.AddProcessToGamer(tempProcess);
                     }
 
                     if (this.endProcessRetrieval)

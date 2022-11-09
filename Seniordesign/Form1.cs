@@ -27,11 +27,11 @@ namespace Seniordesign
         public Form1()
         {
             InitializeComponent();
-            string startFilePath = FileWorker.CreateInitialDirectoryWithFiles();
+            string starterFilesPath = FileWorker.CreateInitialDirectoryWithFiles();
 
-            if (startFilePath != "" && startFilePath != null)
+            if (starterFilesPath != "" && starterFilesPath != null)
             {
-                this.label1.Text = "Welcome to our senior design project: \n your start file will be located at  " + startFilePath + " \n Please open this file and verify your initial values are set correctly";
+                this.label1.Text = "Welcome to our senior design project: \n your starting files will be located at  " + starterFilesPath + " \n Please open these files and verify your initial values are set correctly";
             }
             else
             {
@@ -49,6 +49,10 @@ namespace Seniordesign
             {
                 this.button1.Visible = true;
             }
+            else
+            {
+                this.label1.Text = "No Gamers Loaded, please enter gamers into intial start file and restart application";
+            }
 
             this.load.Visible = false;
 
@@ -59,7 +63,10 @@ namespace Seniordesign
                 this.listBox1.Items.Add(g.Name +" : " + status);
             }
 
-            this.label1.Text = "Gamers Loaded: Click wmi to start getting processes";
+            if (gamerCache.GamerDictionary.Count > 0)
+            {
+                this.label1.Text = "Gamers Loaded: Click wmi to start getting processes";
+            }
 
         }
 
@@ -138,7 +145,7 @@ namespace Seniordesign
                               ? "Connected : "
                               : "Disconnected : ";
                             this.listBox1.Invoke(new Action(() => this.listBox1.Items.RemoveAt(i)));
-                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi complete : " + g.Processes.Count + " Process Instances recorded")));
+                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi complete : " + g.Processes.Keys.Count + "Different Processes recorded")));
                    
                         }
                     }
