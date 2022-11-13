@@ -101,7 +101,7 @@ namespace Seniordesign
             // 
             // End_Session
             // 
-            this.End_Session.Location = new System.Drawing.Point(958, 392);
+            this.End_Session.Location = new System.Drawing.Point(519, 378);
             this.End_Session.Name = "End_Session";
             this.End_Session.Size = new System.Drawing.Size(97, 38);
             this.End_Session.TabIndex = 6;

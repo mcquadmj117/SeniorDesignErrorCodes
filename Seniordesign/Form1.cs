@@ -42,30 +42,42 @@ namespace Seniordesign
 
         private void load_Click(object sender, EventArgs e)
         {
-            //will probably want to load list of banned processes here
-            bpc = FileWorker.LoadBadProcesses(bpc);
-            gamerCache = FileWorker.LoadGamersFromExcel(gamerCache);
-            if (gamerCache.GamerDictionary.Count > 0)
+            bool loaded = true;
+            try
             {
-                this.button1.Visible = true;
+                //will probably want to load list of banned processes here
+                bpc = FileWorker.LoadBadProcesses(bpc);
+                gamerCache = FileWorker.LoadGamersFromExcel(gamerCache);
             }
-            else
+            catch(Exception ex)
             {
-                this.label1.Text = "No Gamers Loaded, please enter gamers into intial start file and restart application";
+                this.label1.Text = "Issue getting starting data due to following error \n " + ex.Message;
+                loaded = false;
             }
-
-            this.load.Visible = false;
-
-            foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
+            if (loaded)
             {
-                string status = "waiting for wmi start";
+                if (gamerCache.GamerDictionary.Count > 0)
+                {
+                    this.button1.Visible = true;
+                }
+                else
+                {
+                    this.label1.Text = "No Gamers Loaded, please enter gamers into intial start file and restart application";
+                }
 
-                this.listBox1.Items.Add(g.Name +" : " + status);
-            }
+                this.load.Visible = false;
 
-            if (gamerCache.GamerDictionary.Count > 0)
-            {
-                this.label1.Text = "Gamers Loaded: Click wmi to start getting processes";
+                foreach (Gamer g in this.gamerCache.GamerDictionary.Values)
+                {
+                    string status = "waiting for wmi start";
+
+                    this.listBox1.Items.Add(g.Name + " : " + status);
+                }
+
+                if (gamerCache.GamerDictionary.Count > 0)
+                {
+                    this.label1.Text = "Gamers Loaded: Click wmi to start getting processes";
+                }
             }
 
         }
@@ -156,15 +168,15 @@ namespace Seniordesign
 
         private void stop_Click(object sender, EventArgs e)
         {
-            this.label1.Text = "WMI process ended Click button to load your results into excel";
+   
             this.wmiActive = false;
             this.stop.Enabled = false;
             wmiProcess.EndProcessRetrieval();
             //need to work on proper garbage collection
             this.wmiProcess = null;
 
-            
 
+            this.label1.Text = "WMI process ended Click button to load your results into excel";
             this.Load_Results_Into_Excel.Visible = true;
         }
 

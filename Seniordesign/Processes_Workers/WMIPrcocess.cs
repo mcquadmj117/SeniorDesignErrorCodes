@@ -147,7 +147,7 @@ namespace Seniordesign.Processes_Workers
 
                     Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
 
-                    if (loopCount >= 0 && loopCount < 10 && !this.endProcessRetrieval)
+                    if (loopCount >= 0 && loopCount < 5 && !this.endProcessRetrieval)
                     {
                         loopCount++;
                         Thread.Sleep(5000);
@@ -158,7 +158,7 @@ namespace Seniordesign.Processes_Workers
                         if(loopCount >= 0)
                         {
                             LogItem li = new LogItem();
-                            li.LogMessage = "Pulse has reached 10 rotations : Attempting to Switch to Watching Convention";
+                            li.LogMessage = "Pulse has reached 5 rotations : Attempting to Switch to Watching Convention";
                             li.GoodLog = true;
                             li.Time = DateTime.Now;
                             g.ExceptionLog.Add(li);
