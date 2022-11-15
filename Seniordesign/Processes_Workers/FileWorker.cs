@@ -135,24 +135,32 @@ namespace Seniordesign.Processes_Workers
             folder);
 
             string filepath = partialPath + "\\BadProcesses.csv";
-            string[] lines = System.IO.File.ReadAllLines(filepath);
-            foreach (string line in lines)
+            try
             {
-                string[] columns = line.Split(',');
-                foreach (string column in columns)
+                string[] lines = System.IO.File.ReadAllLines(filepath);
+                foreach (string line in lines)
                 {
-                    if (!string.IsNullOrWhiteSpace(column)) { }
-                    string badProcessString = column;
-                    badProcessString = badProcessString.Replace(" ", "");
-                    badProcessString = badProcessString.Replace(".exe", "");
-                    badProcessString = badProcessString.ToLower();
-                    badProcessString = badProcessString.Trim();
-
-                    if (!badProcesses.BadProcesses.Contains(badProcessString) && badProcessString != "" && badProcessString != null)
+                    string[] columns = line.Split(',');
+                    foreach (string column in columns)
                     {
-                        badProcesses.BadProcesses.Add(badProcessString);
+                        if (!string.IsNullOrWhiteSpace(column)) { }
+                        string badProcessString = column;
+                        badProcessString = badProcessString.Replace(" ", "");
+                        badProcessString = badProcessString.Replace(".exe", "");
+                        badProcessString = badProcessString.ToLower();
+                        badProcessString = badProcessString.Trim();
+
+                        if (!badProcesses.BadProcesses.Contains(badProcessString) && badProcessString != "" && badProcessString != null)
+                        {
+                            badProcesses.BadProcesses.Add(badProcessString);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message != null && ex.Message != "" ? ex.Message : ex.ToString());
+                throw;
             }
             return badProcesses;
         }
@@ -344,6 +352,12 @@ namespace Seniordesign.Processes_Workers
                             for(int i = 2; i < tempStringList.Count + 2; i++ ) 
                             {
                                 worksheet.Cells[i, 1].Value = tempStringList[i - 2];
+                                worksheet.Cells[i, 1].Borders[Excel.XlBordersIndex.xlEdgeLeft].LineStyle =
+         Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+
+
+
+                                worksheet.Cells[i, 1].Borders[Excel.XlBordersIndex.xlEdgeLeft].Weight = Excel.XlBorderWeight.xlThick;
                             }
 
                             tempStringList = GamerCacheDataWorker.GetFirstInstanceTimeList(g.Name, gamerCache);
@@ -365,7 +379,7 @@ namespace Seniordesign.Processes_Workers
                                 worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeRight].LineStyle =
           Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
 
-                                worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeBottom].Weight = Excel.XlBorderWeight.xlThin;
+                            
  
                                 worksheet.Cells[i, 4].Borders[Excel.XlBordersIndex.xlEdgeRight].Weight = Excel.XlBorderWeight.xlThick;
 
