@@ -15,12 +15,13 @@ namespace Seniordesign.DataClasses_Enums
         public string IP_Address { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string Game_Executable { get; set; }
+        public List<string> Expected_Processes { get; set; } = new List<string>();
         public Dictionary<string, List<Process>> Processes { get; set; } = new Dictionary<string, List<Process>>();
 
         public bool Connected { get; set; } = false;
 
         public List<LogItem> ExceptionLog { get; set; } = new List<LogItem>();
+
 
         internal void AddProcessToGamer(Process process)
         {
@@ -41,6 +42,19 @@ namespace Seniordesign.DataClasses_Enums
                 else
                 {
                     this.Processes[process.ProcessName].Add(process);
+                }
+
+            }
+        }
+
+        internal void AddExpectedProcessToGamer(String processString)
+        {
+            //will only store the first and latest instances of a process
+            if (processString != null)
+            {
+
+               if (!this.Expected_Processes.Contains(processString)){
+                    this.Expected_Processes.Add(processString);
                 }
 
             }

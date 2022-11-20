@@ -40,6 +40,8 @@ namespace Seniordesign
 
         }
 
+
+
         private void load_Click(object sender, EventArgs e)
         {
             bool loaded = true;
@@ -84,13 +86,14 @@ namespace Seniordesign
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            this.stop.Visible = true;
-            this.button1.Visible = false;
-            this.wmiProcess = new WMIPrcocess(this.gamerCache);
             this.wmiActive = true;
+            this.stop.Visible = true;
+            this.PauseButton.Visible = true;
+            this.button1.Visible = false;
+            this.wmiProcess = new WMIPrcocess(this.gamerCache);   
             Thread thread1 = new Thread(UpdateUserInterface);
             thread1.Start();
-            this.label1.Text = "WMI in process click stop to end";
+            this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
         }
 
         public void UpdateUserInterface()
@@ -157,31 +160,37 @@ namespace Seniordesign
                               ? "Connected : "
                               : "Disconnected : ";
                             this.listBox1.Invoke(new Action(() => this.listBox1.Items.RemoveAt(i)));
-                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi complete : " + g.Processes.Keys.Count + "Different Processes recorded")));
+                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi paused or complete : " + g.Processes.Keys.Count + "Different Processes recorded")));
                    
                         }
                     }
                 }
+                
             }
            
         }
 
         private void stop_Click(object sender, EventArgs e)
         {
-   
+
+            this.ResumeButton.Visible = false;
             this.wmiActive = false;
-            this.stop.Enabled = false;
-            wmiProcess.EndProcessRetrieval();
-            //need to work on proper garbage collection
-            this.wmiProcess = null;
-
-
+            this.PauseButton.Visible = false;
+            this.stop.Visible = false;
+            if (wmiProcess != null) {
+                wmiProcess.EndProcessRetrieval(this.wmiActive);
+                this.wmiProcess = null;
+            }
+            WaitForGamersToDisconnect();
             this.label1.Text = "WMI process ended Click button to load your results into excel";
             this.Load_Results_Into_Excel.Visible = true;
         }
 
+      
         private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
         {
+            this.label1.Text = "Loading Results Please wait....";
+            Thread.Sleep(1000);
             this.Load_Results_Into_Excel.Visible = false;
             string fileCreated = FileWorker.ViewResultsInExcel(gamerCache,bpc);
             Console.WriteLine("Load results to excel");
@@ -201,6 +210,61 @@ namespace Seniordesign
         {
             System.Windows.Forms.Application.Exit();
         }
-    
+
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            this.stop.Visible = false;
+            this.PauseButton.Visible = false;
+            this.label1.Invoke(new Action(() => this.label1.Text = "Pausing... \n Please wait for processes to stop"));        
+          
+            this.wmiActive = false;
+       
+            wmiProcess.EndProcessRetrieval(this.wmiActive);
+            WaitForGamersToDisconnect();
+            this.wmiProcess = null;
+          
+            this.stop.Enabled = true;
+            this.stop.Visible = true;
+            //need to work on proper garbage collection
+
+            Thread.Sleep(3000);
+            this.label1.Text = "WMI process paused. Select End or Resume to Continue";
+            this.ResumeButton.Visible = true;
+
+        }
+
+        private void ResumeButton_Click(object sender, EventArgs e)
+        {
+            this.label1.Text = "Resuming...";
+            this.wmiActive = true;
+            this.ResumeButton.Visible = false;
+            Thread.Sleep(1000);
+            this.button1.Visible = false;
+            this.wmiProcess = new WMIPrcocess(this.gamerCache);
+            Thread thread1 = new Thread(UpdateUserInterface);
+            thread1.Start();
+            this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
+            this.stop.Visible = true;
+            this.PauseButton.Visible = true;
+        }
+
+        private void RestartButton_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
+
+        private void WaitForGamersToDisconnect()
+        {
+            foreach(Gamer g in gamerCache.GamerDictionary.Values)
+            {
+                if(g.Connected == true)
+                {
+                    Thread.Sleep(1000);
+                    WaitForGamersToDisconnect();
+                       
+                }
+            }
+        }
+
     }
 }

@@ -57,7 +57,7 @@ namespace Seniordesign.Processes_Workers
                         sheet.Cells[1, 3].Value = "IP_Address(optional)";
                         sheet.Cells[1, 4].Value = "Username";
                         sheet.Cells[1, 5].Value = "Password";
-                        sheet.Cells[1, 6].Value = "Game_Executable";
+                        sheet.Cells[1, 6].Value = "Expected_Processes(seperate by comma)";
                         sheet.Cells[1, 7].Value = "Inserted_Processes(seperate by comma)";
              
                         Excel.Range rng = sheet.Range["A1:G1"];
@@ -222,8 +222,19 @@ namespace Seniordesign.Processes_Workers
                                     g.Password = range.Cells[i, j].Value2.ToString() ?? "";
                                     break;
                                 case 6:
-                                    g.Game_Executable = range.Cells[i, j].Value2.ToString() ?? "";
-                                    break;
+                                    string expectedProcessNames = "";
+                                    List<string> expectedProcessStrings = new List<string>();
+                                    if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
+                                    {
+                                        expectedProcessNames = range.Cells[i, j]?.Value2?.ToString();
+                                        expectedProcessStrings = expectedProcessNames.Split(',').ToList();
+                                    }
+
+                                    foreach (string pn in expectedProcessStrings)
+                                    {
+                                        g.AddExpectedProcessToGamer(pn);
+                                    }
+                                    break;                                   
                                 case 7:
                                     string processNames = "";
                                     List<string> processStrings = new List<string>();
@@ -300,9 +311,11 @@ namespace Seniordesign.Processes_Workers
                 }
 
                     int fileNum = Directory.GetFiles(resultPath).Length;
-                while (File.Exists(resultPath + "\\ErrorCodeResults" + fileNum.ToString() + ".xlsx"))
-                {
-                    fileNum++;
+                if (File.Exists(resultPath + "\\ErrorCodeResults" + fileNum.ToString() + ".xlsx")){
+                    while (File.Exists(resultPath + "\\ErrorCodeResults" + fileNum.ToString() + ".xlsx"))
+                    {
+                        fileNum++;
+                    }
                 }
 
                 Excel.Application ExcelApp = new Excel.Application();

@@ -36,6 +36,9 @@ namespace Seniordesign
             this.Load_Results_Into_Excel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.End_Session = new System.Windows.Forms.Button();
+            this.PauseButton = new System.Windows.Forms.Button();
+            this.ResumeButton = new System.Windows.Forms.Button();
+            this.RestartButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // load
@@ -44,6 +47,7 @@ namespace Seniordesign
             this.load.Name = "load";
             this.load.Size = new System.Drawing.Size(198, 23);
             this.load.TabIndex = 0;
+            this.load.TabStop = false;
             this.load.Text = "Load_Gamers_From_Excel";
             this.load.UseVisualStyleBackColor = true;
             this.load.Click += new System.EventHandler(this.load_Click);
@@ -54,7 +58,8 @@ namespace Seniordesign
             this.stop.Name = "stop";
             this.stop.Size = new System.Drawing.Size(75, 23);
             this.stop.TabIndex = 1;
-            this.stop.Text = "Stop";
+            this.stop.TabStop = false;
+            this.stop.Text = "End";
             this.stop.UseVisualStyleBackColor = true;
             this.stop.Visible = false;
             this.stop.Click += new System.EventHandler(this.stop_Click);
@@ -65,6 +70,7 @@ namespace Seniordesign
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 2;
+            this.button1.TabStop = false;
             this.button1.Text = "Start_WMI";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Visible = false;
@@ -84,6 +90,7 @@ namespace Seniordesign
             this.Load_Results_Into_Excel.Name = "Load_Results_Into_Excel";
             this.Load_Results_Into_Excel.Size = new System.Drawing.Size(75, 23);
             this.Load_Results_Into_Excel.TabIndex = 4;
+            this.Load_Results_Into_Excel.TabStop = false;
             this.Load_Results_Into_Excel.Text = "Load_Results_Into_Excel";
             this.Load_Results_Into_Excel.UseVisualStyleBackColor = true;
             this.Load_Results_Into_Excel.Visible = false;
@@ -105,16 +112,55 @@ namespace Seniordesign
             this.End_Session.Name = "End_Session";
             this.End_Session.Size = new System.Drawing.Size(97, 38);
             this.End_Session.TabIndex = 6;
+            this.End_Session.TabStop = false;
             this.End_Session.Text = "End_Session";
             this.End_Session.UseVisualStyleBackColor = true;
             this.End_Session.Visible = false;
             this.End_Session.Click += new System.EventHandler(this.End_Session_Click);
+            // 
+            // PauseButton
+            // 
+            this.PauseButton.Location = new System.Drawing.Point(770, 105);
+            this.PauseButton.Name = "PauseButton";
+            this.PauseButton.Size = new System.Drawing.Size(75, 23);
+            this.PauseButton.TabIndex = 7;
+            this.PauseButton.TabStop = false;
+            this.PauseButton.Text = "Pause";
+            this.PauseButton.UseVisualStyleBackColor = true;
+            this.PauseButton.Visible = false;
+            this.PauseButton.Click += new System.EventHandler(this.PauseButton_Click);
+            // 
+            // ResumeButton
+            // 
+            this.ResumeButton.Location = new System.Drawing.Point(860, 105);
+            this.ResumeButton.Name = "ResumeButton";
+            this.ResumeButton.Size = new System.Drawing.Size(75, 23);
+            this.ResumeButton.TabIndex = 8;
+            this.ResumeButton.TabStop = false;
+            this.ResumeButton.Text = "Resume";
+            this.ResumeButton.UseVisualStyleBackColor = true;
+            this.ResumeButton.Visible = false;
+            this.ResumeButton.Click += new System.EventHandler(this.ResumeButton_Click);
+            // 
+            // RestartButton
+            // 
+            this.RestartButton.Location = new System.Drawing.Point(7, 2);
+            this.RestartButton.Name = "RestartButton";
+            this.RestartButton.Size = new System.Drawing.Size(261, 23);
+            this.RestartButton.TabIndex = 9;
+            this.RestartButton.TabStop = false;
+            this.RestartButton.Text = "Restart App For New Session";
+            this.RestartButton.UseVisualStyleBackColor = true;
+            this.RestartButton.Click += new System.EventHandler(this.RestartButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1126, 453);
+            this.Controls.Add(this.RestartButton);
+            this.Controls.Add(this.ResumeButton);
+            this.Controls.Add(this.PauseButton);
             this.Controls.Add(this.End_Session);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Load_Results_Into_Excel);
@@ -138,6 +184,9 @@ namespace Seniordesign
         private System.Windows.Forms.Button Load_Results_Into_Excel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button End_Session;
+        private System.Windows.Forms.Button PauseButton;
+        private System.Windows.Forms.Button ResumeButton;
+        private System.Windows.Forms.Button RestartButton;
     }
 }
 

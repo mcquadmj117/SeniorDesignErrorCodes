@@ -11,7 +11,7 @@ using Seniordesign.DataClasses_Enums;
 
 namespace Seniordesign.Processes_Workers
 {
-    class WMIPrcocess
+    class WMIPrcocess : IDisposable
     {
         public delegate void WatchProc(Gamer g);
     
@@ -179,7 +179,10 @@ namespace Seniordesign.Processes_Workers
                 Console.WriteLine("Process Retrieval for " + g.Name + " :( Failed Due to error: " + ex.Message + "setting pulse convention count to 0");
        
                 Thread.Sleep(5000);
-                EstablishInitialManagementScopeConnection(g, 0);
+                if (!this.endProcessRetrieval)
+                {
+                    EstablishInitialManagementScopeConnection(g, 0);
+                }
 
 
             }
@@ -234,23 +237,50 @@ namespace Seniordesign.Processes_Workers
                new ManagementEventWatcher(scope, queryString);
                     //startWatch.Start();
                     ManagementBaseObject e = null;
+                    watcher.Options.Timeout = TimeSpan.FromSeconds(6);
                     while (!this.endProcessRetrieval)
                     {
-                       
+                        if (g.ExceptionLog.Last().GoodLog == false && scope.IsConnected)
+                        {
+                            LogItem goodLogOverride = new LogItem();
+                            LogItem connected = new LogItem();
+                            connected.Time = DateTime.Now;
+                            connected.GoodLog = true;
+                            connected.LogMessage = g.Name + " CONNECTED  Process Watching";
+                            g.Connected = true;
+                            g.ExceptionLog.Add(connected);
+                            g.Connected = true;
+
+                        }
+                        try
+                        {
                             e = watcher.WaitForNextEvent();
-                        
-                        var proc = GetProcessInfo(e);
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Retrieved Process From watch:");
-                        Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
-                        //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
-                        Process tempProcess = new Process();
-                        tempProcess.ProcessName = proc.ProcessName;
-                        tempProcess.Time = proc.TimeCreated;
-                        tempProcess.Starting = true;
-                        tempProcess.ProcessId = proc.PID;
-                        tempProcess.ExecPath = proc.ExecPath;
-                        g.AddProcessToGamer(tempProcess);
+                        }
+                        catch (System.Management.ManagementException error)
+                        {
+                            if (error.ErrorCode != ManagementStatus.Timedout)
+                            {
+                                throw;
+                            }
+                             
+                        }
+
+                        if (e != null)
+                        {
+                            var proc = GetProcessInfo(e);
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Retrieved Process From watch:");
+                            Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
+                            //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
+                            Process tempProcess = new Process();
+                            tempProcess.ProcessName = proc.ProcessName;
+                            tempProcess.Time = proc.TimeCreated;
+                            tempProcess.Starting = true;
+                            tempProcess.ProcessId = proc.PID;
+                            tempProcess.ExecPath = proc.ExecPath;
+                            g.AddProcessToGamer(tempProcess);
+                        }
+                       
                     }
 
                     if (this.endProcessRetrieval)
@@ -268,8 +298,11 @@ namespace Seniordesign.Processes_Workers
                 li.Time = DateTime.Now;
                 g.ExceptionLog.Add(li);
                 Console.WriteLine("watch failed for " + g.Name + " , switching to pulse convention due to following error:: " + ex.Message);
-                Thread.Sleep(5000);
-                EstablishInitialManagementScopeConnection(g, 0);
+                Thread.Sleep(4000);
+                if (!this.endProcessRetrieval)
+                {
+                    EstablishInitialManagementScopeConnection(g, 0);
+                }
             }
         }
 
@@ -300,13 +333,25 @@ namespace Seniordesign.Processes_Workers
 
         }
 
-        public void EndProcessRetrieval()
+        public void EndProcessRetrieval(bool wmiActive)
         {
-            this.endProcessRetrieval = true;
-            foreach (Thread t in this.threadList)
+            if (wmiActive == false )
             {
-                t.Abort();
+                this.endProcessRetrieval = true;
+                foreach (Thread t in this.threadList)
+                {
+                    t.Abort();
+                }
+                Thread.Sleep(2000);
+                Dispose();
             }
+           
+        }
+
+        public void Dispose()
+        {
+            //dispose managed objects;
+
         }
 
         internal class ProcessInfo
