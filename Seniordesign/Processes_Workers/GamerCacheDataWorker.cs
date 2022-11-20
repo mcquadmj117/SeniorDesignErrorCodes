@@ -114,7 +114,55 @@ namespace Seniordesign.Processes_Workers
         public static List<LogItem> GetLogsForGamer(string gamerName, GamerCache gc)
         {
             List<LogItem> targetGamerLogList = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).ExceptionLog.OrderBy(li => li.Time).ToList();
-            return targetGamerLogList;
+            List<LogItem> targetGamerExpectedProcessLogList = GetExpectedProcessLogsForGamer(gamerName, gc);
+
+           targetGamerExpectedProcessLogList.AddRange(targetGamerLogList);
+
+            return targetGamerExpectedProcessLogList;
+
+        }
+
+        public static List<LogItem> GetExpectedProcessLogsForGamer(string gamerName, GamerCache gc)
+        {
+            List<LogItem> loglist = new List<LogItem>();
+           List<string> expectedProcesses = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Expected_Processes;
+            if (expectedProcesses.Count > 0)
+            {
+                List<string> distinctProcessStrings = GetDistinctProcessesNames(gamerName, gc);
+                foreach (string xProc in expectedProcesses)
+                {
+                    bool foundFlag = false;
+                    foreach (string proc in distinctProcessStrings)
+                    {
+                        
+                            if (proc.ToLower().Replace(".exe", "").Replace(" ","").Equals(xProc.ToLower().Replace(".exe", "").Replace(" ", ""), StringComparison.OrdinalIgnoreCase))
+                            {
+                                foundFlag = true;
+                                break;
+                            }
+                                        
+                    }
+
+                    if (foundFlag == true)
+                    {
+                        LogItem li = new LogItem();
+                        li.GoodLog = true;
+                        li.LogMessage = "Expected process " + xProc + " was found";
+                        li.Time = default;
+                        loglist.Add(li);
+                    }
+                    else
+                    {
+                        LogItem li = new LogItem();
+                        li.GoodLog = false;
+                        li.LogMessage = "Expected process " + xProc + " was not found";
+                        li.Time = default;
+                        loglist.Add(li);
+                    }
+
+                }
+            }
+            return loglist;
 
         }
     }
