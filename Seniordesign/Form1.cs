@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.CompilerServices;
 
 namespace Seniordesign
 {
@@ -20,13 +21,24 @@ namespace Seniordesign
         BadProcessCache bpc = new BadProcessCache();
         WMIPrcocess wmiProcess;
         bool wmiActive = false;
+        List<string> critList = new List<string>();
 
         Regex Name_Extraction_Regex = new Regex("([^\\s]+)");
+        private System.Windows.Forms.Timer timer1;
+     
 
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //UpdateUserInterface();
+            Thread thread1 = new Thread(UpdateUserInterface);
+            thread1.Start();
+        }
 
         public Form1()
         {
             InitializeComponent();
+            InitTimer();
+            
             string starterFilesPath = FileWorker.CreateInitialDirectoryWithFiles();
 
             if (starterFilesPath != "" && starterFilesPath != null)
@@ -38,6 +50,14 @@ namespace Seniordesign
                 this.label1.Text = "trouble loading start file";
             }
 
+        }
+
+        public void InitTimer()
+        {
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Interval = 3000; // in miliseconds
+    
         }
 
 
@@ -61,6 +81,8 @@ namespace Seniordesign
                 if (gamerCache.GamerDictionary.Count > 0)
                 {
                     this.button1.Visible = true;
+                    this.CritNotLabel.Visible = true;
+                    this.CritNotListBox.Visible = true;
                 }
                 else
                 {
@@ -90,84 +112,125 @@ namespace Seniordesign
             this.stop.Visible = true;
             this.PauseButton.Visible = true;
             this.button1.Visible = false;
-            this.wmiProcess = new WMIPrcocess(this.gamerCache);   
-            Thread thread1 = new Thread(UpdateUserInterface);
-            thread1.Start();
+            this.wmiProcess = new WMIPrcocess(this.gamerCache, this.bpc.BadProcesses);   
+            //Thread thread1 = new Thread(UpdateUserInterface);
+            //thread1.Start();
             this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
+            this.timer1.Start();
         }
 
         public void UpdateUserInterface()
         {
-          
-            Console.WriteLine("updating interface");
-
-            foreach(Gamer g in this.gamerCache.GamerDictionary.Values.ToList())
+            try
             {
+                Console.WriteLine("updating interface");
 
-                
-                for (int i = 0; i < this.listBox1.Items.Count; i++)
-                {
-                    string status = "";
-                    string name = Name_Extraction_Regex.Match(this.listBox1.Items[i].ToString()).ToString();
-                    if(name == g.Name){
-                       
-                        if (g.ExceptionLog.Count > 0){
-                             status = g.Connected == true
-                                ? "Connected : " + g.ExceptionLog?.Last()?.LogMessage?.ToString()
-                                : "Disconnected : " + g.ExceptionLog?.Last()?.LogMessage?.ToString();
-                        }
-                        else
-                        {
-                             status = g.Connected == true
-                               ? "Connected : "
-                               : "Disconnected : ";
-                        }
-                        string previousVal = listBox1.Items[i].ToString();
-
-                        string listString = g.Name + " : " + status;
-
-                        if(listString.Replace(".","") == previousVal.Replace(".", ""))
-                        {
-                            listString = previousVal + ".";
-                          listString =   listString.Replace(".....", "");
-                        }
-
-
-                        this.listBox1.Invoke(new Action(() => this.listBox1.Items.RemoveAt(i)));
-                        this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, listString)));
-                    }
-                }
- 
-            }
-
-
-            Thread.Sleep(3000);
-            if(wmiActive)
-            {
-                this.UpdateUserInterface();
-            }
-            else
-            {
                 foreach (Gamer g in this.gamerCache.GamerDictionary.Values.ToList())
                 {
+
+                    //make variable for g.execution llog
                     for (int i = 0; i < this.listBox1.Items.Count; i++)
                     {
                         string status = "";
+
+              
                         string name = Name_Extraction_Regex.Match(this.listBox1.Items[i].ToString()).ToString();
                         if (name == g.Name)
                         {
-                            status = g.Connected == true
-                              ? "Connected : "
-                              : "Disconnected : ";
+                            //update status
+                            if (g.ExceptionLog.Count > 0)
+                            {
+                                status = g.Connected == true
+                                   ? "Connected : " + g.ExceptionLog?.Where(el => el.CriticalMessage == false).Last()?.LogMessage?.ToString()
+                                   : "Disconnected : " + g.ExceptionLog?.Where(el => el.CriticalMessage == false).Last()?.LogMessage?.ToString();
+                            }
+                            else
+                            {
+                                status = g.Connected == true
+                                  ? "Connected : "
+                                  : "Disconnected : ";
+                            }
+                            string previousVal = listBox1.Items[i].ToString();
+
+                            string listString = g.Name + " : " + status;
+
+                            if (listString.Replace(".", "") == previousVal.Replace(".", ""))
+                            {
+                                listString = previousVal + ".";
+                                listString = listString.Replace(".....", "");
+                            }
+
+
                             this.listBox1.Invoke(new Action(() => this.listBox1.Items.RemoveAt(i)));
-                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi paused or complete : " + g.Processes.Keys.Count + "Different Processes recorded")));
-                   
+                            this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, listString)));
+                            
                         }
                     }
+                    //update critical list
+                    if (g.ExceptionLog.Where(el => el.CriticalMessage == true).Count() > 0)
+                    {
+
+                        DateTime a = g.ExceptionLog?.Where(el => el.CriticalMessage == true).Last()?.Time ?? DateTime.Now;
+                        DateTime b = new DateTime(a.Year, a.Month, a.Day, a.Hour, a.Minute, 0, a.Kind);
+                        string alteredTime = b.ToString();
+
+
+                        string lastCriticalMessage = "";
+                        lastCriticalMessage = g.ExceptionLog?.Where(el => el.CriticalMessage == true).Last()?.LogMessage?.ToString() + " : " + alteredTime;// take off seconds
+
+
+                        //if(this.critList.Count == 0)
+                        //{
+                        //    this.critList.Add(lastCriticalMessage);
+                        //}
+
+                        // if (!(this.critList?.Last() == lastCriticalMessage))//fix logic 
+                        if (!this.critList.Contains(lastCriticalMessage))
+                        {
+                            this.critList.Add(lastCriticalMessage);
+                            this.CritNotListBox.Invoke(new Action(() => this.CritNotListBox.Items.Add(lastCriticalMessage)));
+                        }
+
+
+                    }
                 }
-                
+
+
+        
+                if (wmiActive) { 
+                //{
+                //    RuntimeHelpers.EnsureSufficientExecutionStack();
+                //    this.UpdateUserInterface();
+                }
+                else
+                {
+                    foreach (Gamer g in this.gamerCache.GamerDictionary.Values.ToList())
+                    {
+                        for (int i = 0; i < this.listBox1.Items.Count; i++)
+                        {
+                            string status = "";
+                            string name = Name_Extraction_Regex.Match(this.listBox1.Items[i].ToString()).ToString();
+                            if (name == g.Name)
+                            {
+                                status = g.Connected == true
+                                  ? "Connected : "
+                                  : "Disconnected : ";
+                                this.listBox1.Invoke(new Action(() => this.listBox1.Items.RemoveAt(i)));
+                                this.listBox1.Invoke(new Action(() => this.listBox1.Items.Insert(i, g.Name + " : wmi paused or complete : " + g.Processes.Keys.Count + "Different Processes recorded")));
+
+                            }
+                        }
+                    }
+
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);    
+                
            
+            }
+            
         }
 
         private void stop_Click(object sender, EventArgs e)
@@ -213,6 +276,7 @@ namespace Seniordesign
 
         private void PauseButton_Click(object sender, EventArgs e)
         {
+        
             this.stop.Visible = false;
             this.PauseButton.Visible = false;
             this.label1.Invoke(new Action(() => this.label1.Text = "Pausing... \n Please wait for processes to stop"));        
@@ -235,14 +299,15 @@ namespace Seniordesign
 
         private void ResumeButton_Click(object sender, EventArgs e)
         {
+   
             this.label1.Text = "Resuming...";
             this.wmiActive = true;
             this.ResumeButton.Visible = false;
             Thread.Sleep(1000);
             this.button1.Visible = false;
-            this.wmiProcess = new WMIPrcocess(this.gamerCache);
-            Thread thread1 = new Thread(UpdateUserInterface);
-            thread1.Start();
+            this.wmiProcess = new WMIPrcocess(this.gamerCache, this.bpc.BadProcesses);
+            //Thread thread1 = new Thread(UpdateUserInterface);
+            //thread1.Start();
             this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
             this.stop.Visible = true;
             this.PauseButton.Visible = true;
@@ -264,6 +329,40 @@ namespace Seniordesign
                        
                 }
             }
+        }
+
+
+        private void SystemPause(object sender, EventArgs e)
+        {
+            this.stop.Visible = false;
+            this.PauseButton.Visible = false;
+            this.label1.Invoke(new Action(() => this.label1.Text = "resestting stack... \n App will continue shortly"));
+
+            this.wmiActive = false;
+
+            wmiProcess.EndProcessRetrieval(this.wmiActive);
+            WaitForGamersToDisconnect();
+            this.wmiProcess = null;
+
+            this.stop.Enabled = true;
+            this.stop.Visible = true;
+            //need to work on proper garbage collection
+
+            Thread.Sleep(1000);
+
+            this.label1.Text = "Resuming...";
+            this.wmiActive = true;
+            this.ResumeButton.Visible = false;
+            Thread.Sleep(1000);
+            this.button1.Visible = false;
+            this.wmiProcess = new WMIPrcocess(this.gamerCache, this.bpc.BadProcesses);
+            Thread thread1 = new Thread(UpdateUserInterface);
+            thread1.Start();
+            this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
+            this.stop.Visible = true;
+            this.PauseButton.Visible = true;
+
+
         }
 
     }

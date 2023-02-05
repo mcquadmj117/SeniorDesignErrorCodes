@@ -39,6 +39,9 @@ namespace Seniordesign
             this.PauseButton = new System.Windows.Forms.Button();
             this.ResumeButton = new System.Windows.Forms.Button();
             this.RestartButton = new System.Windows.Forms.Button();
+            this.CritNotListBox = new System.Windows.Forms.ListBox();
+            this.CritNotLabel = new System.Windows.Forms.Label();
+            this.PartStatLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // load
@@ -79,16 +82,16 @@ namespace Seniordesign
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(52, 155);
+            this.listBox1.Location = new System.Drawing.Point(39, 224);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(1028, 147);
+            this.listBox1.Size = new System.Drawing.Size(1028, 108);
             this.listBox1.TabIndex = 3;
             // 
             // Load_Results_Into_Excel
             // 
-            this.Load_Results_Into_Excel.Location = new System.Drawing.Point(519, 319);
+            this.Load_Results_Into_Excel.Location = new System.Drawing.Point(198, 428);
             this.Load_Results_Into_Excel.Name = "Load_Results_Into_Excel";
-            this.Load_Results_Into_Excel.Size = new System.Drawing.Size(75, 23);
+            this.Load_Results_Into_Excel.Size = new System.Drawing.Size(115, 38);
             this.Load_Results_Into_Excel.TabIndex = 4;
             this.Load_Results_Into_Excel.TabStop = false;
             this.Load_Results_Into_Excel.Text = "Load_Results_Into_Excel";
@@ -108,7 +111,7 @@ namespace Seniordesign
             // 
             // End_Session
             // 
-            this.End_Session.Location = new System.Drawing.Point(519, 378);
+            this.End_Session.Location = new System.Drawing.Point(998, 484);
             this.End_Session.Name = "End_Session";
             this.End_Session.Size = new System.Drawing.Size(97, 38);
             this.End_Session.TabIndex = 6;
@@ -153,11 +156,42 @@ namespace Seniordesign
             this.RestartButton.UseVisualStyleBackColor = true;
             this.RestartButton.Click += new System.EventHandler(this.RestartButton_Click);
             // 
+            // CritNotListBox
+            // 
+            this.CritNotListBox.FormattingEnabled = true;
+            this.CritNotListBox.Location = new System.Drawing.Point(533, 402);
+            this.CritNotListBox.Name = "CritNotListBox";
+            this.CritNotListBox.Size = new System.Drawing.Size(312, 95);
+            this.CritNotListBox.TabIndex = 10;
+            this.CritNotListBox.Visible = false;
+            // 
+            // CritNotLabel
+            // 
+            this.CritNotLabel.AutoSize = true;
+            this.CritNotLabel.Location = new System.Drawing.Point(622, 386);
+            this.CritNotLabel.Name = "CritNotLabel";
+            this.CritNotLabel.Size = new System.Drawing.Size(99, 13);
+            this.CritNotLabel.TabIndex = 11;
+            this.CritNotLabel.Text = "Critical Notifications";
+            this.CritNotLabel.Visible = false;
+            // 
+            // PartStatLabel
+            // 
+            this.PartStatLabel.AutoSize = true;
+            this.PartStatLabel.Location = new System.Drawing.Point(121, 208);
+            this.PartStatLabel.Name = "PartStatLabel";
+            this.PartStatLabel.Size = new System.Drawing.Size(147, 13);
+            this.PartStatLabel.TabIndex = 12;
+            this.PartStatLabel.Text = "Participant Connection Status";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1126, 453);
+            this.ClientSize = new System.Drawing.Size(1126, 551);
+            this.Controls.Add(this.PartStatLabel);
+            this.Controls.Add(this.CritNotLabel);
+            this.Controls.Add(this.CritNotListBox);
             this.Controls.Add(this.RestartButton);
             this.Controls.Add(this.ResumeButton);
             this.Controls.Add(this.PauseButton);
@@ -187,6 +221,9 @@ namespace Seniordesign
         private System.Windows.Forms.Button PauseButton;
         private System.Windows.Forms.Button ResumeButton;
         private System.Windows.Forms.Button RestartButton;
+        private System.Windows.Forms.ListBox CritNotListBox;
+        private System.Windows.Forms.Label CritNotLabel;
+        private System.Windows.Forms.Label PartStatLabel;
     }
 }
 

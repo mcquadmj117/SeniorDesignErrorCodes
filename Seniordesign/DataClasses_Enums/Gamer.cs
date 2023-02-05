@@ -16,6 +16,8 @@ namespace Seniordesign.DataClasses_Enums
         public string Username { get; set; }
         public string Password { get; set; }
         public List<string> Expected_Processes { get; set; } = new List<string>();
+
+        public List<string> Bad_Processes { get; set; } = new List<string>();
         public Dictionary<string, List<Process>> Processes { get; set; } = new Dictionary<string, List<Process>>();
 
         public bool Connected { get; set; } = false;
