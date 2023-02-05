@@ -19,8 +19,9 @@ namespace Seniordesign.Processes_Workers
 
         public List<Thread> threadList = new List<Thread>();
 
-        public WMIPrcocess(GamerCache gamerCache)
+        public WMIPrcocess(GamerCache gamerCache, List<string> badProcessList)
         {
+            List<string> badProcceses = new List<string>();
 
             //foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
             //{
@@ -45,7 +46,7 @@ namespace Seniordesign.Processes_Workers
      
             foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
             {
-                threadList.Add(new Thread(() => EstablishInitialManagementScopeConnection(gamer)) { IsBackground = true, Name = gamer.Name });
+                threadList.Add(new Thread(() => EstablishInitialManagementScopeConnection(gamer, badProcessList)) { IsBackground = true, Name = gamer.Name });
 
                 // new Thread(RunProcessWatching(gamer.Name)) { IsBackground = true, Name = gamer.Name }.Start();
             }
@@ -84,8 +85,9 @@ namespace Seniordesign.Processes_Workers
             #endregion
         }
 
-        private void EstablishInitialManagementScopeConnection(Gamer g, int loopCount = -1, ManagementScope scope = null)
+        private void EstablishInitialManagementScopeConnection(Gamer g, List<string> badProcessList , int loopCount = -1, ManagementScope scope = null  )
         {
+
             try
             {
                 if (!this.endProcessRetrieval)
@@ -131,11 +133,32 @@ namespace Seniordesign.Processes_Workers
                         Process tempProcess = new DataClasses_Enums.Process();
                         
                         tempProcess.ProcessName = queryObj["Caption"].ToString();
+
                         tempProcess.Time = DateTime.Now;
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = queryObj["PROCESSID"]?.ToString();
                         tempProcess.ExecPath = queryObj["ExecutablePath"]?.ToString() != null ? queryObj["ExecutablePath"]?.ToString() : "path not available";
+                        //evaluateProcesses
+                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
+                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
+                        tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
+                        tempProcess.ProcessName = tempProcess.ProcessName.Trim();
+                        //evaluateProcesses
+                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
+                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
+                        tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
+                        tempProcess.ProcessName = tempProcess.ProcessName.Trim();
 
+                       
+                        if (badProcessList.Contains(tempProcess.ProcessName))
+                        {
+                            LogItem tempLog = new LogItem();
+                            tempLog.CriticalMessage = true;
+                            tempLog.GoodLog = false;
+                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
+                            tempLog.Time = DateTime.Now;
+                            g.ExceptionLog.Add(tempLog);
+                        }
                         if (g.Processes == null)
                         {
                             g.Processes = new Dictionary<string, List<Process>>();
@@ -151,7 +174,7 @@ namespace Seniordesign.Processes_Workers
                     {
                         loopCount++;
                         Thread.Sleep(5000);
-                        EstablishInitialManagementScopeConnection(g, loopCount, scope != null && scope.IsConnected ? scope : null );
+                        EstablishInitialManagementScopeConnection(g,badProcessList, loopCount, scope != null && scope.IsConnected ? scope : null );
                     }
                     else if(!this.endProcessRetrieval)
                     {
@@ -164,7 +187,7 @@ namespace Seniordesign.Processes_Workers
                             g.ExceptionLog.Add(li);
                         }
 
-                        RunProcessWatching(g);
+                        RunProcessWatching(g,badProcessList);
                     }
                 }
             }
@@ -181,15 +204,18 @@ namespace Seniordesign.Processes_Workers
                 Thread.Sleep(5000);
                 if (!this.endProcessRetrieval)
                 {
-                    EstablishInitialManagementScopeConnection(g, 0);
+                    EstablishInitialManagementScopeConnection(g,badProcessList, 0);
                 }
 
 
             }
         }
 
-        public void RunProcessWatching(Gamer g)
-        {            
+        public void RunProcessWatching(Gamer g, List<string> badProcessList)
+        {
+
+            
+
                 try
                 {
                 
@@ -278,6 +304,20 @@ namespace Seniordesign.Processes_Workers
                             tempProcess.Starting = true;
                             tempProcess.ProcessId = proc.PID;
                             tempProcess.ExecPath = proc.ExecPath;
+                            //evaluateProcesses
+                            tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
+                            tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
+                            tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
+                            tempProcess.ProcessName = tempProcess.ProcessName.Trim();
+
+                            if (badProcessList.Contains(tempProcess.ProcessName)){
+                               LogItem tempLog = new LogItem();
+                                tempLog.CriticalMessage = true;
+                                tempLog.GoodLog = false;
+                                tempLog.Time = DateTime.Now;
+                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
+                                g.ExceptionLog.Add(tempLog);
+                            }
                             g.AddProcessToGamer(tempProcess);
                         }
                        
@@ -301,7 +341,7 @@ namespace Seniordesign.Processes_Workers
                 Thread.Sleep(4000);
                 if (!this.endProcessRetrieval)
                 {
-                    EstablishInitialManagementScopeConnection(g, 0);
+                    EstablishInitialManagementScopeConnection(g, badProcessList,0);
                 }
             }
         }

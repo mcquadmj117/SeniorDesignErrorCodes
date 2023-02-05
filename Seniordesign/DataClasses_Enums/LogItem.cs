@@ -14,5 +14,7 @@ namespace Seniordesign.DataClasses_Enums
 
         public bool GoodLog { get; set; } = false;
 
+        public bool CriticalMessage { get; set; } = false;
+
     }
 }
