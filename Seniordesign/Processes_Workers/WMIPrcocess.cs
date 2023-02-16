@@ -107,9 +107,18 @@ namespace Seniordesign.Processes_Workers
                         options.EnablePrivileges = true;
                         options.Impersonation = System.Management.ImpersonationLevel.Impersonate;
                         string machineName = g.Computer_Name;
-
-                        scope = new ManagementScope("\\\\" + machineName + "\\root\\cimv2", options);
-
+                        if (machineName != null && machineName != string.Empty)
+                        {
+                            scope = new ManagementScope("\\\\" + machineName + "\\root\\cimv2", options);
+                        }
+                        else if(g.IP_Address != null && g.IP_Address != string.Empty)
+                        {
+                            scope = new ManagementScope("\\\\" + g.IP_Address + "\\root\\cimv2", options);
+                        }
+                        else
+                        {
+                            throw new Exception("participant " + g.Name + " had no valid machine name or ip_address");
+                        }
                         scope.Connect();
                     }
                     if (scope.IsConnected)
