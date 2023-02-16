@@ -202,31 +202,32 @@ namespace Seniordesign.Processes_Workers
                     for (int i = 2; i <= rowCount; i++)
                     {
                         Gamer g = new Gamer();
-                        for (int j = 1; j <= colCount; j++)
+                        for (int j = 1; j <= 8; j++)
                         {
+                       
                             switch (j)
                             {
                                 case 1:
-                                    g.Name = range.Cells[i, j]?.Value2?.ToString() ?? "";
+                                    g.Name = range.Cells[i, j]?.Text?.ToString() ?? "";
                                     break;
                                 case 2:
-                                    g.Computer_Name = range.Cells[i, j]?.Value2?.ToString() ?? "";
+                                    g.Computer_Name = range.Cells[i, j]?.Text?.ToString() ?? "";
                                     break;
                                 case 3:
-                                    g.IP_Address = range.Cells[i, j].Value2.ToString() ?? "";
+                                        g.IP_Address = range.Cells[i, j]?.Text?.ToString() ?? "";
                                     break;
                                 case 4:
-                                    g.Username = range.Cells[i, j].Value2.ToString() ?? "";
+                                    g.Username = range.Cells[i, j]?.Text.ToString() ?? "";
                                     break;
                                 case 5:
-                                    g.Password = range.Cells[i, j].Value2.ToString() ?? "";
+                                    g.Password = range.Cells[i, j]?.Text.ToString() ?? "";
                                     break;
                                 case 6:
                                     string expectedProcessNames = "";
                                     List<string> expectedProcessStrings = new List<string>();
-                                    if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
+                                    if (range.Cells[i, j]?.Text?.ToString() != null && range.Cells[i, j]?.Text?.ToString() != string.Empty)
                                     {
-                                        expectedProcessNames = range.Cells[i, j]?.Value2?.ToString();
+                                        expectedProcessNames = range.Cells[i, j]?.Text?.ToString();
                                         expectedProcessStrings = expectedProcessNames.Split(',').ToList();
                                     }
 
@@ -238,9 +239,9 @@ namespace Seniordesign.Processes_Workers
                                 case 7:
                                     string processNames = "";
                                     List<string> processStrings = new List<string>();
-                                    if (range.Cells[i, j]?.Value2?.ToString() != null && range.Cells[i, j]?.Value2?.ToString() != string.Empty)
+                                    if (range.Cells[i, j]?.Text?.ToString() != null && range.Cells[i, j]?.Text?.ToString() != string.Empty)
                                     {
-                                        processNames =  range.Cells[i, j]?.Value2?.ToString();
+                                        processNames =  range.Cells[i, j]?.Text?.ToString();
                                         processStrings = processNames.Split(',').ToList();
                                     }
                                  
@@ -252,8 +253,12 @@ namespace Seniordesign.Processes_Workers
                                     break;                                
                             }
                         }
-                        
+
+                        if (g.Name != null && g.Name != string.Empty)
+                        {
                             gamerCache.GamerDictionary.Add(g.Name, g);
+                        }
+                        
                         
                     }
                 }
