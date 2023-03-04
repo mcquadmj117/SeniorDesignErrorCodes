@@ -115,7 +115,7 @@ namespace Seniordesign
             this.wmiProcess = new WMIPrcocess(this.gamerCache, this.bpc.BadProcesses);   
             //Thread thread1 = new Thread(UpdateUserInterface);
             //thread1.Start();
-            this.label1.Text = "WMI in process click end to move results or Pause to pause WMI session";
+            this.label1.Text = "WMI in process. Click end to move on to the results. Or Pause to pause WMI session";
             this.timer1.Start();
         }
 
@@ -235,23 +235,32 @@ namespace Seniordesign
 
         private void stop_Click(object sender, EventArgs e)
         {
-
+            this.label1.Text = "WMI process ending... Please wait";
             this.ResumeButton.Visible = false;
             this.wmiActive = false;
             this.PauseButton.Visible = false;
             this.stop.Visible = false;
             if (wmiProcess != null) {
                 wmiProcess.EndProcessRetrieval(this.wmiActive);
+                WaitForGamersToDisconnect();
                 this.wmiProcess = null;
             }
-            WaitForGamersToDisconnect();
-            this.label1.Text = "WMI process ended Click button to load your results into excel";
+
+            Thread.Sleep(1000);
             this.Load_Results_Into_Excel.Visible = true;
+
+            this.label1.Text = "WMI ended Click button to load your results into excel";
+            this.UpdateUserInterface();
+            this.timer1.Stop();
+
+
         }
 
       
         private void Load_Results_Into_Excel_Click(object sender, EventArgs e)
         {
+
+      
             this.label1.Text = "Loading Results Please wait....";
             Thread.Sleep(1000);
             this.Load_Results_Into_Excel.Visible = false;

@@ -338,7 +338,7 @@ namespace Seniordesign.Processes_Workers
                             worksheet.Cells[1, 1].Value = "All_Processes_Ran";
                             worksheet.Cells[1, 2].Value = "First_Instance_Time";
                             worksheet.Cells[1, 3].Value = "Last_Instance_Time";
-                            worksheet.Cells[1, 4].Value = "Process_Executable_Path";
+                            worksheet.Cells[1, 4].Value = "Process_AdditionalInfo";
                             worksheet.Cells[1, 5].Value = "Participant_Exclusive_Processes_Ran";
                             worksheet.Cells[1, 6].Value = "Identified_Bad_Processes";
                             worksheet.Cells[1, 7].Value = "Log and Errors";
@@ -390,7 +390,7 @@ namespace Seniordesign.Processes_Workers
                                 worksheet.Cells[i, 3].Value = tempStringList[i - 2];
                             }
 
-                            tempStringList = GamerCacheDataWorker.GetExecPathForFirstInstances(g.Name, gamerCache);
+                            tempStringList = GamerCacheDataWorker.GetAdditionalInfoForFirstInstances(g.Name, gamerCache);
                             for (int i = 2; i < tempStringList.Count + 2; i++)
                             {
                                 worksheet.Cells[i, 4].Value = tempStringList[i - 2];

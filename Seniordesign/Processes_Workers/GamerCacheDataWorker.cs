@@ -95,20 +95,28 @@ namespace Seniordesign.Processes_Workers
             return lastInstanceTimeList;
         }
 
-        public static List<string> GetExecPathForFirstInstances(string gamerName, GamerCache gc)
+        public static List<string> GetAdditionalInfoForFirstInstances(string gamerName, GamerCache gc)
         {
-            List<string> processPathList = new List<string>();
+            List<string> addInfoList = new List<string>();
 
             List<string> targetGamerProcessNameList = GetDistinctProcessesNames(gamerName, gc);
 
             foreach (string p in targetGamerProcessNameList)
             {
                 string targetProcessPath = "no Path Available";
+                string description = "no desc";
+                string altName = "altName";
                 Process proc = gc.GamerDictionary.Values.FirstOrDefault(g => g.Name == gamerName).Processes[p].First();
                 targetProcessPath = proc.ExecPath?.ToString() ?? targetProcessPath;
-                processPathList.Add(targetProcessPath);
+                description = proc.Description ?? description;
+                altName = proc.Name2 ?? altName;
+
+
+                addInfoList.Add("Path:(" + targetProcessPath + ")"
+                    + " Description:(" + description + ")"
+                    + " AltName:(" + altName + ")"); 
             }
-            return processPathList;
+            return addInfoList;
         }
 
         public static List<LogItem> GetLogsForGamer(string gamerName, GamerCache gc)

@@ -85,7 +85,7 @@ namespace Seniordesign.Processes_Workers
             #endregion
         }
 
-        private void EstablishInitialManagementScopeConnection(Gamer g, List<string> badProcessList , int loopCount = -1, ManagementScope scope = null  )
+        private void EstablishInitialManagementScopeConnection(Gamer g, List<string> badProcessList , int loopCount = 0, ManagementScope scope = null  )
         {
 
             try
@@ -132,7 +132,7 @@ namespace Seniordesign.Processes_Workers
                         Console.WriteLine(g.Name + " CONNECTED: Grabbing Current Processes");
                     }
 
-                    ObjectQuery query = new ObjectQuery("SELECT Caption, ProcessID, ExecutablePath FROM Win32_Process");
+                    ObjectQuery query = new ObjectQuery("SELECT Caption, ProcessID, ExecutablePath, Description,Name FROM Win32_Process");
                     ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query);
 
                     int processCount = 0;
@@ -141,32 +141,63 @@ namespace Seniordesign.Processes_Workers
 
                         Process tempProcess = new DataClasses_Enums.Process();
                         
-                        tempProcess.ProcessName = queryObj["Caption"].ToString();
+                        tempProcess.ProcessName = queryObj["Caption"]?.ToString();
 
                         tempProcess.Time = DateTime.Now;
                         tempProcess.Starting = true;
                         tempProcess.ProcessId = queryObj["PROCESSID"]?.ToString();
                         tempProcess.ExecPath = queryObj["ExecutablePath"]?.ToString() != null ? queryObj["ExecutablePath"]?.ToString() : "path not available";
+                        tempProcess.Description = queryObj["Description"]?.ToString() ?? "";
+                        tempProcess.Name2 = queryObj["Name"]?.ToString() ?? "";
+                        //tempProcess.CreationClassName = queryObj["CreationClassName"]?.ToString() ?? "";
                         //evaluateProcesses
-                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
-                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
-                        tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
-                        tempProcess.ProcessName = tempProcess.ProcessName.Trim();
+                        tempProcess.ProcessName = tempProcess.ProcessName?.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                        tempProcess.ExecPath = tempProcess.ExecPath.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                        tempProcess.Name2 = tempProcess.Name2.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                        tempProcess.Description = tempProcess.Description.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
                         //evaluateProcesses
-                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
-                        tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
-                        tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
-                        tempProcess.ProcessName = tempProcess.ProcessName.Trim();
 
-                       
                         if (badProcessList.Contains(tempProcess.ProcessName))
                         {
                             LogItem tempLog = new LogItem();
                             tempLog.CriticalMessage = true;
                             tempLog.GoodLog = false;
-                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
                             tempLog.Time = DateTime.Now;
+                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
                             g.ExceptionLog.Add(tempLog);
+                        }
+                        else if (badProcessList.Contains(tempProcess.Name2))
+                        {
+                            LogItem tempLog = new LogItem();
+                            tempLog.CriticalMessage = true;
+                            tempLog.GoodLog = false;
+                            tempLog.Time = DateTime.Now;
+                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Name2;
+                            g.ExceptionLog.Add(tempLog);
+                        }
+                        else if (badProcessList.Contains(tempProcess.Description))
+                        {
+                            LogItem tempLog = new LogItem();
+                            tempLog.CriticalMessage = true;
+                            tempLog.GoodLog = false;
+                            tempLog.Time = DateTime.Now;
+                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Description;
+                            g.ExceptionLog.Add(tempLog);
+                        }
+                        else
+                        {
+                            foreach (string badProcess in badProcessList)
+                            {
+                                if (tempProcess.ExecPath.Contains(badProcess))
+                                {
+                                    LogItem tempLog = new LogItem();
+                                    tempLog.CriticalMessage = true;
+                                    tempLog.GoodLog = false;
+                                    tempLog.Time = DateTime.Now;
+                                    tempLog.LogMessage = g.Name + " : Banned Process Found :" + badProcess;
+                                    g.ExceptionLog.Add(tempLog);
+                                }
+                            }
                         }
                         if (g.Processes == null)
                         {
@@ -179,11 +210,24 @@ namespace Seniordesign.Processes_Workers
 
                     Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
 
-                    if (loopCount >= 0 && loopCount < 5 && !this.endProcessRetrieval)
+                    if (loopCount == 0 && loopCount < 5 && !this.endProcessRetrieval)
+                    {                  
+                        Thread.Sleep(3000);
+                        LogItem li = new LogItem();
+                        li.LogMessage = "Initial Retrieval successful switching to watch";
+                        li.GoodLog = true;
+                        li.Time = DateTime.Now;
+                        g.ExceptionLog.Add(li);
+
+                        RunProcessWatching(g, badProcessList);
+                     
+                     
+                    }
+                    else if(loopCount >= 0 && loopCount < 5 && !this.endProcessRetrieval)
                     {
                         loopCount++;
                         Thread.Sleep(5000);
-                        EstablishInitialManagementScopeConnection(g,badProcessList, loopCount, scope != null && scope.IsConnected ? scope : null );
+                        EstablishInitialManagementScopeConnection(g, badProcessList, loopCount, scope != null && scope.IsConnected ? scope : null);
                     }
                     else if(!this.endProcessRetrieval)
                     {
@@ -197,6 +241,12 @@ namespace Seniordesign.Processes_Workers
                         }
 
                         RunProcessWatching(g,badProcessList);
+                    }
+                    else 
+                    {
+                       
+                        g.Connected = false;
+                      
                     }
                 }
             }
@@ -305,27 +355,59 @@ namespace Seniordesign.Processes_Workers
                             var proc = GetProcessInfo(e);
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Retrieved Process From watch:");
-                            Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CommandLine, proc.User);
+                            Console.WriteLine("+ {0} {1} {2} ({3}) {4} [{5}]", g.Name, proc.ProcessName, proc.ExecPath, proc.PID, proc.CreationClassName, proc.Description);
                             //            Console.WriteLine("+ {0} ({1}) {2} > {3} ({4}) {5}", proc.ProcessName, proc.PID, proc.CommandLine, pproc.ProcessName, pproc.PID, pproc.CommandLine);
                             Process tempProcess = new Process();
-                            tempProcess.ProcessName = proc.ProcessName;
-                            tempProcess.Time = proc.TimeCreated;
+                            tempProcess.ProcessName = proc.ProcessName?.ToLower().Trim().Replace(" ", "").Replace(".exe", ""); 
+                            tempProcess.Time = proc.Time;
                             tempProcess.Starting = true;
                             tempProcess.ProcessId = proc.PID;
-                            tempProcess.ExecPath = proc.ExecPath;
-                            //evaluateProcesses
-                            tempProcess.ProcessName = tempProcess.ProcessName.Replace(" ", "");
-                            tempProcess.ProcessName = tempProcess.ProcessName.Replace(".exe", "");
-                            tempProcess.ProcessName = tempProcess.ProcessName.ToLower();
-                            tempProcess.ProcessName = tempProcess.ProcessName.Trim();
+                            tempProcess.ExecPath = proc.ExecPath.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                            tempProcess.Name2 = proc.Name2.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                            tempProcess.Description = proc.Description.ToLower().Trim().Replace(" ", "").Replace(".exe", "");
+                            
 
-                            if (badProcessList.Contains(tempProcess.ProcessName)){
-                               LogItem tempLog = new LogItem();
+                            //evaluateProcesses
+                          
+
+                            if (badProcessList.Contains(tempProcess.ProcessName)) {
+                                LogItem tempLog = new LogItem();
                                 tempLog.CriticalMessage = true;
                                 tempLog.GoodLog = false;
                                 tempLog.Time = DateTime.Now;
                                 tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
                                 g.ExceptionLog.Add(tempLog);
+                            }
+                            else if (badProcessList.Contains(tempProcess.Name2))
+                            {
+                                LogItem tempLog = new LogItem();
+                                tempLog.CriticalMessage = true;
+                                tempLog.GoodLog = false;
+                                tempLog.Time = DateTime.Now;
+                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Name2;
+                                g.ExceptionLog.Add(tempLog);
+                            }
+                            else if (badProcessList.Contains(tempProcess.Description)){
+                                LogItem tempLog = new LogItem();
+                                tempLog.CriticalMessage = true;
+                                tempLog.GoodLog = false;
+                                tempLog.Time = DateTime.Now;
+                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Description;
+                                g.ExceptionLog.Add(tempLog);
+                            }
+                            else
+                            {
+                                foreach (string badProcess in badProcessList)
+                                {
+                                    if (tempProcess.ExecPath.Contains(badProcess)) {
+                                        LogItem tempLog = new LogItem();
+                                        tempLog.CriticalMessage = true;
+                                        tempLog.GoodLog = false;
+                                        tempLog.Time = DateTime.Now;
+                                        tempLog.LogMessage = g.Name + " : Banned Process Found :" + badProcess;
+                                        g.ExceptionLog.Add(tempLog);
+                                    }
+                                }
                             }
                             g.AddProcessToGamer(tempProcess);
                         }
@@ -335,6 +417,7 @@ namespace Seniordesign.Processes_Workers
                     if (this.endProcessRetrieval)
                     {
                         watcher.Stop();
+                        g.Connected = false;
                     }
 
                 }
@@ -355,9 +438,9 @@ namespace Seniordesign.Processes_Workers
             }
         }
 
-        static ProcessInfo GetProcessInfo(ManagementBaseObject mbo)
+        static Process GetProcessInfo(ManagementBaseObject mbo)
         {
-            ProcessInfo p = new ProcessInfo();
+            Process p = new Process();
             if (mbo != null)
             {
 
@@ -365,14 +448,18 @@ namespace Seniordesign.Processes_Workers
                 try
                 {
                     var targetInstance = (System.Management.ManagementBaseObject)mbo.Properties["TargetInstance"]?.Value;
-                    p.ProcessName = targetInstance?.Properties["Caption"]?.Value?.ToString();
-                    p.PID = targetInstance?.Properties["ProcessId"]?.Value?.ToString();
+                    p.ProcessName = targetInstance?.Properties["Caption"]?.Value?.ToString() ?? "";
+                    p.PID = targetInstance?.Properties["ProcessId"]?.Value?.ToString() ?? "";
                     p.ExecPath = targetInstance?.Properties["ExecutablePath"]?.Value?.ToString() != null
                         ? targetInstance?.Properties["ExecutablePath"]?.Value?.ToString()
                         : "Path Not Available";
+                    p.Description = targetInstance?.Properties["Description"]?.Value?.ToString() ?? "";
+                    p.Name2 = targetInstance?.Properties["Name"]?.Value?.ToString() ?? "";
+                    p.CreationClassName = targetInstance?.Properties["CreationClassName"]?.Value?.ToString() ?? "";
+
                     //todo convert uint64 for timecreated
                     // p.TimeCreated = DateTime.FromBinary((Int64)e.NewEvent?.Properties["TIME_CREATED"]?.Value);
-                    p.TimeCreated = DateTime.Now;
+                    p.Time = DateTime.Now;
                 }
                 catch (Exception ex) { throw ex; }
                
