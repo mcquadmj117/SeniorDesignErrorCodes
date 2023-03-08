@@ -210,10 +210,10 @@ namespace Seniordesign.Processes_Workers
 
                     Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
                     
-                    if (init)
-                    {
-                        foreach 
-                    }
+                    //if (init)
+                    //{
+                    //    foreach //todo do initial expected check
+                    //}
 
                     if (loopCount == 0 && loopCount < 5 && !this.endProcessRetrieval)
                     {                  
