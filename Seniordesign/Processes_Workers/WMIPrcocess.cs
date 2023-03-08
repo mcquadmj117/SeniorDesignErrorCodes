@@ -46,7 +46,7 @@ namespace Seniordesign.Processes_Workers
      
             foreach (Gamer gamer in gamerCache.GamerDictionary.Values)
             {
-                threadList.Add(new Thread(() => EstablishInitialManagementScopeConnection(gamer, badProcessList)) { IsBackground = true, Name = gamer.Name });
+                threadList.Add(new Thread(() => EstablishInitialManagementScopeConnection(gamer, badProcessList, 0, null, true)) { IsBackground = true, Name = gamer.Name });
 
                 // new Thread(RunProcessWatching(gamer.Name)) { IsBackground = true, Name = gamer.Name }.Start();
             }
@@ -85,7 +85,7 @@ namespace Seniordesign.Processes_Workers
             #endregion
         }
 
-        private void EstablishInitialManagementScopeConnection(Gamer g, List<string> badProcessList , int loopCount = 0, ManagementScope scope = null  )
+        private void EstablishInitialManagementScopeConnection(Gamer g, List<string> badProcessList , int loopCount = 0, ManagementScope scope = null, bool init = false)
         {
 
             try
@@ -209,6 +209,11 @@ namespace Seniordesign.Processes_Workers
                     }
 
                     Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
+                    
+                    if (init)
+                    {
+                        foreach 
+                    }
 
                     if (loopCount == 0 && loopCount < 5 && !this.endProcessRetrieval)
                     {                  
@@ -240,6 +245,7 @@ namespace Seniordesign.Processes_Workers
                             g.ExceptionLog.Add(li);
                         }
 
+                        
                         RunProcessWatching(g,badProcessList);
                     }
                     else 
