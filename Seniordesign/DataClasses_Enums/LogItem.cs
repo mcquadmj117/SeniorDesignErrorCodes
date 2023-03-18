@@ -16,5 +16,8 @@ namespace Seniordesign.DataClasses_Enums
 
         public bool CriticalMessage { get; set; } = false;
 
+        public System.DateTime FormattedTime { get => new DateTime(this.Time.Year, this.Time.Month, this.Time.Day, this.Time.Hour, this.Time.Minute, 0, this.Time.Kind); }
+   
+
     }
 }

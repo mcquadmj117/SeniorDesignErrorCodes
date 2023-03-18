@@ -43,7 +43,7 @@ namespace Seniordesign
 
             if (starterFilesPath != "" && starterFilesPath != null)
             {
-                this.label1.Text = "Welcome to our senior design project: \n your starting files will be located at  " + starterFilesPath + " \n Please open these files and verify your initial values are set correctly";
+                this.label1.Text = "Welcome to Fx3 \n Your starting files will be located at  " + starterFilesPath + " \n Please open these files and verify your initial values are set correctly";
             }
             else
             {
@@ -100,7 +100,7 @@ namespace Seniordesign
 
                 if (gamerCache.GamerDictionary.Count > 0)
                 {
-                    this.label1.Text = "Gamers Loaded: Click wmi to start getting processes";
+                    this.label1.Text = "Gamers Loaded: Click start_wmi to start begin momnitoring processes";
                 }
             }
 
@@ -170,28 +170,14 @@ namespace Seniordesign
                     if (g.ExceptionLog.Where(el => el.CriticalMessage == true).Count() > 0)
                     {
 
-                        DateTime a = g.ExceptionLog?.Where(el => el.CriticalMessage == true).Last()?.Time ?? DateTime.Now;
-                        DateTime b = new DateTime(a.Year, a.Month, a.Day, a.Hour, a.Minute, 0, a.Kind);
-                        string alteredTime = b.ToString();
-
-
-                        string lastCriticalMessage = "";
-                        lastCriticalMessage = g.ExceptionLog?.Where(el => el.CriticalMessage == true).Last()?.LogMessage?.ToString() + " : " + alteredTime;// take off seconds
-
-
-                        //if(this.critList.Count == 0)
-                        //{
-                        //    this.critList.Add(lastCriticalMessage);
-                        //}
-
-                        // if (!(this.critList?.Last() == lastCriticalMessage))//fix logic 
-                        if (!this.critList.Contains(lastCriticalMessage))
+                        LogItem logItem = g.ExceptionLog?.Where(el => el.CriticalMessage == true && !this.critList.Contains(el.LogMessage?.ToString() + " : " + el.FormattedTime.ToString()))?.FirstOrDefault();
+                
+                        if(logItem != null)
                         {
-                            this.critList.Add(lastCriticalMessage);
-                            this.CritNotListBox.Invoke(new Action(() => this.CritNotListBox.Items.Add(lastCriticalMessage)));
+                            this.critList.Add(logItem.LogMessage?.ToString() + " : " + logItem.FormattedTime.ToString());
+                            this.CritNotListBox.Invoke(new Action(() => this.CritNotListBox.Items.Add(logItem.LogMessage?.ToString() + " : " + logItem.FormattedTime.ToString())));
                         }
-
-
+                     
                     }
                 }
 
@@ -374,5 +360,6 @@ namespace Seniordesign
 
         }
 
+       
     }
 }

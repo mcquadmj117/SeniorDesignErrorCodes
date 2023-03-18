@@ -42,13 +42,15 @@ namespace Seniordesign
             this.CritNotListBox = new System.Windows.Forms.ListBox();
             this.CritNotLabel = new System.Windows.Forms.Label();
             this.PartStatLabel = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // load
             // 
-            this.load.Location = new System.Drawing.Point(446, 32);
+            this.load.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
+            this.load.Location = new System.Drawing.Point(211, 210);
             this.load.Name = "load";
-            this.load.Size = new System.Drawing.Size(198, 23);
+            this.load.Size = new System.Drawing.Size(257, 30);
             this.load.TabIndex = 0;
             this.load.TabStop = false;
             this.load.Text = "Load_Gamers_From_Excel";
@@ -57,9 +59,10 @@ namespace Seniordesign
             // 
             // stop
             // 
-            this.stop.Location = new System.Drawing.Point(958, 105);
+            this.stop.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.stop.Location = new System.Drawing.Point(1039, 37);
             this.stop.Name = "stop";
-            this.stop.Size = new System.Drawing.Size(75, 23);
+            this.stop.Size = new System.Drawing.Size(75, 32);
             this.stop.TabIndex = 1;
             this.stop.TabStop = false;
             this.stop.Text = "End";
@@ -69,9 +72,10 @@ namespace Seniordesign
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(155, 105);
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
+            this.button1.Location = new System.Drawing.Point(55, 210);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(124, 30);
             this.button1.TabIndex = 2;
             this.button1.TabStop = false;
             this.button1.Text = "Start_WMI";
@@ -82,16 +86,17 @@ namespace Seniordesign
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(39, 224);
+            this.listBox1.Location = new System.Drawing.Point(55, 292);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(1028, 108);
             this.listBox1.TabIndex = 3;
             // 
             // Load_Results_Into_Excel
             // 
-            this.Load_Results_Into_Excel.Location = new System.Drawing.Point(198, 428);
+            this.Load_Results_Into_Excel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.Load_Results_Into_Excel.Location = new System.Drawing.Point(2, 489);
             this.Load_Results_Into_Excel.Name = "Load_Results_Into_Excel";
-            this.Load_Results_Into_Excel.Size = new System.Drawing.Size(115, 38);
+            this.Load_Results_Into_Excel.Size = new System.Drawing.Size(211, 50);
             this.Load_Results_Into_Excel.TabIndex = 4;
             this.Load_Results_Into_Excel.TabStop = false;
             this.Load_Results_Into_Excel.Text = "Load_Results_Into_Excel";
@@ -102,18 +107,23 @@ namespace Seniordesign
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F);
-            this.label1.Location = new System.Drawing.Point(26, 69);
+            this.label1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F);
+            this.label1.ForeColor = System.Drawing.SystemColors.MenuText;
+            this.label1.Location = new System.Drawing.Point(276, 81);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(77, 20);
+            this.label1.Padding = new System.Windows.Forms.Padding(0, 2, 0, 4);
+            this.label1.Size = new System.Drawing.Size(88, 32);
             this.label1.TabIndex = 5;
             this.label1.Text = "InfoLabel";
             // 
             // End_Session
             // 
-            this.End_Session.Location = new System.Drawing.Point(998, 484);
+            this.End_Session.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.End_Session.Location = new System.Drawing.Point(992, 532);
             this.End_Session.Name = "End_Session";
-            this.End_Session.Size = new System.Drawing.Size(97, 38);
+            this.End_Session.Size = new System.Drawing.Size(138, 38);
             this.End_Session.TabIndex = 6;
             this.End_Session.TabStop = false;
             this.End_Session.Text = "End_Session";
@@ -123,9 +133,10 @@ namespace Seniordesign
             // 
             // PauseButton
             // 
-            this.PauseButton.Location = new System.Drawing.Point(770, 105);
+            this.PauseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.PauseButton.Location = new System.Drawing.Point(785, 37);
             this.PauseButton.Name = "PauseButton";
-            this.PauseButton.Size = new System.Drawing.Size(75, 23);
+            this.PauseButton.Size = new System.Drawing.Size(80, 32);
             this.PauseButton.TabIndex = 7;
             this.PauseButton.TabStop = false;
             this.PauseButton.Text = "Pause";
@@ -135,9 +146,10 @@ namespace Seniordesign
             // 
             // ResumeButton
             // 
-            this.ResumeButton.Location = new System.Drawing.Point(860, 105);
+            this.ResumeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.ResumeButton.Location = new System.Drawing.Point(891, 37);
             this.ResumeButton.Name = "ResumeButton";
-            this.ResumeButton.Size = new System.Drawing.Size(75, 23);
+            this.ResumeButton.Size = new System.Drawing.Size(75, 32);
             this.ResumeButton.TabIndex = 8;
             this.ResumeButton.TabStop = false;
             this.ResumeButton.Text = "Resume";
@@ -147,9 +159,10 @@ namespace Seniordesign
             // 
             // RestartButton
             // 
+            this.RestartButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
             this.RestartButton.Location = new System.Drawing.Point(7, 2);
             this.RestartButton.Name = "RestartButton";
-            this.RestartButton.Size = new System.Drawing.Size(261, 23);
+            this.RestartButton.Size = new System.Drawing.Size(251, 33);
             this.RestartButton.TabIndex = 9;
             this.RestartButton.TabStop = false;
             this.RestartButton.Text = "Restart App For New Session";
@@ -159,18 +172,20 @@ namespace Seniordesign
             // CritNotListBox
             // 
             this.CritNotListBox.FormattingEnabled = true;
-            this.CritNotListBox.Location = new System.Drawing.Point(533, 402);
+            this.CritNotListBox.Location = new System.Drawing.Point(231, 475);
             this.CritNotListBox.Name = "CritNotListBox";
-            this.CritNotListBox.Size = new System.Drawing.Size(312, 95);
+            this.CritNotListBox.Size = new System.Drawing.Size(755, 95);
             this.CritNotListBox.TabIndex = 10;
             this.CritNotListBox.Visible = false;
             // 
             // CritNotLabel
             // 
             this.CritNotLabel.AutoSize = true;
-            this.CritNotLabel.Location = new System.Drawing.Point(622, 386);
+            this.CritNotLabel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.CritNotLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Underline);
+            this.CritNotLabel.Location = new System.Drawing.Point(251, 455);
             this.CritNotLabel.Name = "CritNotLabel";
-            this.CritNotLabel.Size = new System.Drawing.Size(99, 13);
+            this.CritNotLabel.Size = new System.Drawing.Size(131, 17);
             this.CritNotLabel.TabIndex = 11;
             this.CritNotLabel.Text = "Critical Notifications";
             this.CritNotLabel.Visible = false;
@@ -178,17 +193,31 @@ namespace Seniordesign
             // PartStatLabel
             // 
             this.PartStatLabel.AutoSize = true;
-            this.PartStatLabel.Location = new System.Drawing.Point(121, 208);
+            this.PartStatLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F, System.Drawing.FontStyle.Underline);
+            this.PartStatLabel.Location = new System.Drawing.Point(117, 272);
             this.PartStatLabel.Name = "PartStatLabel";
-            this.PartStatLabel.Size = new System.Drawing.Size(147, 13);
+            this.PartStatLabel.Size = new System.Drawing.Size(194, 17);
             this.PartStatLabel.TabIndex = 12;
             this.PartStatLabel.Text = "Participant Connection Status";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.BackColor = System.Drawing.SystemColors.Control;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 24.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))));
+            this.label2.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.label2.Location = new System.Drawing.Point(524, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(75, 38);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Fx3";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1126, 551);
+            this.ClientSize = new System.Drawing.Size(1149, 593);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.PartStatLabel);
             this.Controls.Add(this.CritNotLabel);
             this.Controls.Add(this.CritNotListBox);
@@ -224,6 +253,7 @@ namespace Seniordesign
         private System.Windows.Forms.ListBox CritNotListBox;
         private System.Windows.Forms.Label CritNotLabel;
         private System.Windows.Forms.Label PartStatLabel;
+        private System.Windows.Forms.Label label2;
     }
 }
 
