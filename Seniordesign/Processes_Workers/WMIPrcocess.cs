@@ -203,17 +203,26 @@ namespace Seniordesign.Processes_Workers
                         {
                             g.Processes = new Dictionary<string, List<Process>>();
                         }
-                        g.AddProcessToGamer(tempProcess);
+                        g.AddProcessToGamer(tempProcess, init);
                         processCount++;
            
                     }
 
                     Console.WriteLine("retrieved " + processCount + " current running processes from" + g.Name);
                     
-                    //if (init)
-                    //{
-                    //    foreach //todo do initial expected check
-                    //}
+                    if (init)
+                    {
+                        var missingProcs = g.GetMissingProcesses();
+                      if (missingProcs.Count > 0)
+                        {
+                            LogItem li = new LogItem();
+                            li.LogMessage = g.Name + " : Expected Proccesses Missing"+ " : " + String.Join(", ", missingProcs);
+                            li.GoodLog = false;
+                            li.CriticalMessage = true;
+                            li.Time = DateTime.Now;
+                            g.ExceptionLog.Add(li);
+                        }
+                    }
 
                     if (loopCount == 0 && loopCount < 5 && !this.endProcessRetrieval)
                     {                  

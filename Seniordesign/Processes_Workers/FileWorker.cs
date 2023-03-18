@@ -23,7 +23,7 @@ namespace Seniordesign.Processes_Workers
         {
             try
             {
-                string newFolder = "ErrorCodes";
+                string newFolder = "Fx3";
                 string path = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 newFolder);
@@ -38,7 +38,7 @@ namespace Seniordesign.Processes_Workers
                         throw;
                     }               
                 }
-                if (!File.Exists(path + "\\ErrorCodesStartingFile.xlsx")) {
+                if (!File.Exists(path + "\\Fx3StartingFile.xlsx")) {
                     Excel.Application excelApp = new Excel.Application();
                     excelApp.DisplayAlerts = false;
                     if (excelApp == null)
@@ -80,7 +80,7 @@ namespace Seniordesign.Processes_Workers
                         sheet.Application.ActiveWindow.FreezePanes = true;
 
 
-                        workbook.SaveAs(path + "\\ErrorCodesStartingFile.xlsx");
+                        workbook.SaveAs(path + "\\Fx3StartingFile.xlsx");
 
                         workbook.Close(true, misValue, misValue);
 
@@ -108,9 +108,9 @@ namespace Seniordesign.Processes_Workers
 
                 }
 
-                if(File.Exists(path + "\\ErrorCodesStartingFile.xlsx") && File.Exists(path + "\\BadProcesses.csv"))
+                if(File.Exists(path + "\\Fx3StartingFile.xlsx") && File.Exists(path + "\\BadProcesses.csv"))
                 {                   
-                    return (path + "\\ErrorCodesStartingFile.xlsx" + " and \n " + path + "\\BadProcesses.csv");
+                    return (path + "\\Fx3StartingFile.xlsx" + " and \n " + path + "\\BadProcesses.csv");
                 }
                 else
                 {
@@ -128,7 +128,7 @@ namespace Seniordesign.Processes_Workers
 
         public static BadProcessCache LoadBadProcesses(BadProcessCache badProcesses)
         {
-            string folder = "ErrorCodes";
+            string folder = "Fx3";
           
             string partialPath = System.IO.Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
@@ -184,9 +184,9 @@ namespace Seniordesign.Processes_Workers
 
                 string path = System.IO.Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "ErrorCodes");
+                "Fx3");
 
-                path = path + "\\ErrorCodesStartingFile.xlsx";
+                path = path + "\\Fx3StartingFile.xlsx";
 
                 Excel.Workbook workbook = ExcelApp.Workbooks.Open(path);
 
@@ -247,8 +247,10 @@ namespace Seniordesign.Processes_Workers
                                  
                                                      
                                     foreach (string pn in processStrings)
+
                                     {
-                                        g.AddProcessToGamer(new Process { ProcessName = pn });
+                                                                       
+                                        g.AddProcessToGamer(new Process { ProcessName = pn },true);
                                     }
                                     break;                                
                             }
@@ -299,7 +301,7 @@ namespace Seniordesign.Processes_Workers
 
                 string startPath = System.IO.Path.Combine(
               Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-              "ErrorCodes");
+              "Fx3");
 
                 string resultPath = System.IO.Path.Combine(startPath, "Results");
 
@@ -327,7 +329,7 @@ namespace Seniordesign.Processes_Workers
                 ExcelApp.DisplayAlerts = false;
 
 
-                Excel.Workbook workbook = ExcelApp.Workbooks.Open(startPath + "\\ErrorCodesStartingFile.xlsx");
+                Excel.Workbook workbook = ExcelApp.Workbooks.Open(startPath + "\\Fx3StartingFile.xlsx");
                 try {
                     foreach (Gamer g in gamerCache.GamerDictionary.Values)
                     {
