@@ -100,7 +100,7 @@ namespace Seniordesign
 
                 if (gamerCache.GamerDictionary.Count > 0)
                 {
-                    this.label1.Text = "Gamers Loaded: Click start_wmi to start begin momnitoring processes";
+                    this.label1.Text = "Gamers Loaded: Click start_wmi to start begin monitoring processes";
                 }
             }
 
