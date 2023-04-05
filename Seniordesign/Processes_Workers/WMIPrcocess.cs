@@ -163,7 +163,7 @@ namespace Seniordesign.Processes_Workers
                             tempLog.CriticalMessage = true;
                             tempLog.GoodLog = false;
                             tempLog.Time = DateTime.Now;
-                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
+                            tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.ProcessName;
                             g.ExceptionLog.Add(tempLog);
                         }
                         else if (badProcessList.Contains(tempProcess.Name2))
@@ -172,7 +172,7 @@ namespace Seniordesign.Processes_Workers
                             tempLog.CriticalMessage = true;
                             tempLog.GoodLog = false;
                             tempLog.Time = DateTime.Now;
-                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Name2;
+                            tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.Name2;
                             g.ExceptionLog.Add(tempLog);
                         }
                         else if (badProcessList.Contains(tempProcess.Description))
@@ -181,7 +181,7 @@ namespace Seniordesign.Processes_Workers
                             tempLog.CriticalMessage = true;
                             tempLog.GoodLog = false;
                             tempLog.Time = DateTime.Now;
-                            tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Description;
+                            tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.Description;
                             g.ExceptionLog.Add(tempLog);
                         }
                         else
@@ -194,7 +194,7 @@ namespace Seniordesign.Processes_Workers
                                     tempLog.CriticalMessage = true;
                                     tempLog.GoodLog = false;
                                     tempLog.Time = DateTime.Now;
-                                    tempLog.LogMessage = g.Name + " : Banned Process Found :" + badProcess;
+                                    tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + badProcess;
                                     g.ExceptionLog.Add(tempLog);
                                 }
                             }
@@ -390,7 +390,7 @@ namespace Seniordesign.Processes_Workers
                                 tempLog.CriticalMessage = true;
                                 tempLog.GoodLog = false;
                                 tempLog.Time = DateTime.Now;
-                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.ProcessName;
+                                tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.ProcessName;
                                 g.ExceptionLog.Add(tempLog);
                             }
                             else if (badProcessList.Contains(tempProcess.Name2))
@@ -399,7 +399,7 @@ namespace Seniordesign.Processes_Workers
                                 tempLog.CriticalMessage = true;
                                 tempLog.GoodLog = false;
                                 tempLog.Time = DateTime.Now;
-                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Name2;
+                                tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.Name2;
                                 g.ExceptionLog.Add(tempLog);
                             }
                             else if (badProcessList.Contains(tempProcess.Description)){
@@ -407,7 +407,7 @@ namespace Seniordesign.Processes_Workers
                                 tempLog.CriticalMessage = true;
                                 tempLog.GoodLog = false;
                                 tempLog.Time = DateTime.Now;
-                                tempLog.LogMessage = g.Name + " : Banned Process Found :" + tempProcess.Description;
+                                tempLog.LogMessage = g.Name + " : Possible Banned Process Found :" + tempProcess.Description;
                                 g.ExceptionLog.Add(tempLog);
                             }
                             else
@@ -419,7 +419,7 @@ namespace Seniordesign.Processes_Workers
                                         tempLog.CriticalMessage = true;
                                         tempLog.GoodLog = false;
                                         tempLog.Time = DateTime.Now;
-                                        tempLog.LogMessage = g.Name + " : Banned Process Found :" + badProcess;
+                                        tempLog.LogMessage = g.Name + " : Possible  Banned Process Found :" + badProcess;
                                         g.ExceptionLog.Add(tempLog);
                                     }
                                 }
